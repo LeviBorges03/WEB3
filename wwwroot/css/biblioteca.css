@@ -1,0 +1,156 @@
+/* Variáveis para facilitar alterações futuras de cores */
+:root {
+    --primary: #2c3e50;
+    --accent: #3498db;
+    --bg-light: #f4f7f6;
+    --white: #ffffff;
+    --shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.page-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.biblioteca-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.biblioteca-header h2 {
+    color: var(--primary);
+    font-weight: 700;
+    border-bottom: 3px solid var(--accent);
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+/* --- ESTILO DO CARROSSEL --- */
+.carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.livros-grid {
+    display: flex;
+    overflow-x: auto; /* Permite scroll se os cards estourarem */
+    scroll-behavior: smooth;
+    gap: 20px;
+    padding: 20px 5px;
+    -ms-overflow-style: none;  /* Esconde barra de scroll no IE */
+    scrollbar-width: none;     /* Esconde barra de scroll no Firefox */
+}
+
+.livros-grid::-webkit-scrollbar {
+    display: none; /* Esconde barra de scroll no Chrome/Safari */
+}
+
+.livro-card {
+    min-width: 220px;
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.livro-card:hover {
+    transform: translateY(-5px);
+}
+
+.livro-capa-placeholder {
+    height: 280px;
+    background: #e0e0e0;
+    border-radius: 10px 10px 0 0;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px;
+}
+
+.genero-tag {
+    background: var(--accent);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+.livro-info {
+    padding: 15px;
+}
+
+.livro-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.livro-info p {
+    margin: 5px 0 0;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+}
+
+/* Botões de Navegação */
+.nav-btn {
+    background: var(--white);
+    border: none;
+    box-shadow: var(--shadow);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: absolute;
+    z-index: 10;
+    transition: background 0.3s;
+}
+
+.nav-btn:hover { background: var(--accent); color: white; }
+.left { left: -20px; }
+.right { right: -20px; }
+
+/* --- SEÇÃO INFORMATIVA --- */
+.info-secao {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.info-box h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.info-box p {
+    line-height: 1.6;
+    color: #555;
+}
+
+.extra-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.icon { font-size: 1.5rem; }
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .info-secao { grid-template-columns: 1fr; }
+    .nav-btn { display: none; } /* Em celulares, o usuário apenas arrasta com o dedo */
+    .livros-grid { overflow-x: scroll; }
+}
