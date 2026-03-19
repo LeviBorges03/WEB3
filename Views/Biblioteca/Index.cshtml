@@ -1,0 +1,106 @@
+@model List<Biblioteca.Models.Livro>
+
+@{
+    ViewData["Title"] = "Vitrine da Biblioteca";
+
+    // Helper method para localizar a imagem da capa do livro baseada no título.
+    // Procura por .jpg, .png e .webp na pasta wwwroot/capasImage/
+    string? GetImagePath(string? titulo)
+    {
+        if (string.IsNullOrWhiteSpace(titulo)) return null;
+
+        // Caminho físico absoluto da pasta no servidor (na hora da execução)
+        var basePath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "capasImage");
+
+        // As extensões suportadas, em ordem de preferência
+        var extensões = new[] { ".jpg", ".png", ".webp" };
+
+        foreach(var ext in extensões)
+        {
+            if (System.IO.File.Exists(System.IO.Path.Combine(basePath, titulo + ext)))
+            {
+                return $"/capasImage/{titulo}{ext}";
+            }
+        }
+
+        // Retorna null se nenhuma imagem for encontrada, para usar o placeholder
+        return null;
+    }
+}
+
+@section Styles {
+    @* Link para o arquivo CSS de estilos da biblioteca *@
+    <link rel="stylesheet" href="~/css/biblioteca.css" />
+}
+
+<div class="page-wrapper">
+
+    <section class="biblioteca-header">
+        <h2>Nome da Biblioteca</h2>
+    </section>
+
+    <div class="carousel-container">
+        @* Botão Esquerdo para rolagem *@
+        <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
+
+        @* Grade de Livros com rolagem horizontal *@
+        <div class="livros-grid" id="livrosGrid">
+            @foreach (var item in Model)
+            {
+                <div class="livro-card">
+                    @{
+                        // Pega a URL da imagem da capa, se existir
+                        string? capaUrl = GetImagePath(item.Titulo);
+                    }
+                    <div class="livro-capa-placeholder">
+                        @if (!string.IsNullOrEmpty(capaUrl))
+                        {
+                            <img src="@capaUrl" alt="Capa do livro @item.Titulo" class="img-capa" />
+                        }
+
+                        <span class="genero-tag">@item.Genero</span>
+                    </div>
+                    <div class="livro-info">
+                        <h4>@item.Titulo</h4>
+                        <p>@item.Autor</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Botão Direito para rolagem *@
+        <button class="nav-btn right" onclick="scrollGrid(1)">&#10095;</button>
+    </div>
+
+    <section class="info-secao">
+        <div class="info-box">
+            <h3>Sobre a Nossa Biblioteca</h3>
+            <p>Bem-vindo ao nosso acervo digital! Aqui você encontra uma seleção curada de obras para expandir seus horizontes. Nosso objetivo é facilitar o acesso à leitura de forma organizada e moderna.</p>
+        </div>
+
+        <div class="info-extras">
+            <div class="extra-item">
+                <i class="icon">📅</i>
+                <span><strong>Total de Obras:</strong> @Model.Count títulos</span>
+            </div>
+            <div class="extra-item">
+                <i class="icon">💡</i>
+                <span><strong>Dica:</strong> Use as setas laterais para explorar os livros disponíveis.</span>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // Função simples para rolar os livros lateralmente na grade
+        function scrollGrid(direction) {
+            const grid = document.getElementById('livrosGrid');
+            const scrollAmount = 300; // Distância da rolagem em pixels
+            grid.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+}
