@@ -56,7 +56,6 @@
     box-shadow: var(--shadow);
     transition: transform 0.2s;
     cursor: pointer;
-    overflow: hidden; /* Garante que os filhos respeitem o border-radius */
 }
 
 .livro-card:hover {
@@ -70,20 +69,24 @@
     position: relative;
     display: flex;
     align-items: flex-end;
-    /* padding foi removido para a imagem ocupar 100%. Usamos posição absoluta no genero-tag em vez disso. */
+    padding: 10px;
+    /* Ajuste para que a imagem não transborde os cantos arredondados */
+    overflow: hidden;
 }
 
-/* Imagem da Capa do Livro */
-.img-capa {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Faz a imagem preencher a área cortando as rebarbas sem distorcer */
-    border-radius: 10px 10px 0 0;
+/* Imagem da capa (dinâmica) */
+.livro-capa-img {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1; /* Fica atrás da tag de gênero */
+    width: 100%;
+    height: 100%;
+    /* Faz a imagem preencher a área cortando excessos sem distorcer (mantendo a proporção) */
+    object-fit: cover;
+    /* Coloca a imagem atrás do conteúdo do placeholder, como a tag de gênero */
+    z-index: 1;
 }
+
 
 .genero-tag {
     background: var(--accent);
@@ -91,11 +94,8 @@
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    z-index: 2; /* Fica na frente da imagem */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Dá destaque sobre a imagem */
+    position: relative;
+    z-index: 2; /* Garante que a tag fique sobre a imagem */
 }
 
 .livro-info {

@@ -2,34 +2,10 @@
 
 @{
     ViewData["Title"] = "Vitrine da Biblioteca";
-
-    // Helper method para localizar a imagem da capa do livro baseada no título.
-    // Procura por .jpg, .png e .webp na pasta wwwroot/capasImage/
-    string? GetImagePath(string? titulo)
-    {
-        if (string.IsNullOrWhiteSpace(titulo)) return null;
-
-        // Caminho físico absoluto da pasta no servidor (na hora da execução)
-        var basePath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "capasImage");
-
-        // As extensões suportadas, em ordem de preferência
-        var extensões = new[] { ".jpg", ".png", ".webp" };
-
-        foreach(var ext in extensões)
-        {
-            if (System.IO.File.Exists(System.IO.Path.Combine(basePath, titulo + ext)))
-            {
-                return $"/capasImage/{titulo}{ext}";
-            }
-        }
-
-        // Retorna null se nenhuma imagem for encontrada, para usar o placeholder
-        return null;
-    }
 }
 
 @section Styles {
-    @* Link para o arquivo CSS de estilos da biblioteca *@
+    @* Link para o arquivo CSS que criaremos abaixo *@
     <link rel="stylesheet" href="~/css/biblioteca.css" />
 }
 
@@ -40,7 +16,7 @@
     </section>
 
     <div class="carousel-container">
-        @* Botão Esquerdo para rolagem *@
+        @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
 
         @* Grade de Livros com rolagem horizontal *@
@@ -48,15 +24,14 @@
             @foreach (var item in Model)
             {
                 <div class="livro-card">
-                    @{
-                        // Pega a URL da imagem da capa, se existir
-                        string? capaUrl = GetImagePath(item.Titulo);
-                    }
                     <div class="livro-capa-placeholder">
-                        @if (!string.IsNullOrEmpty(capaUrl))
-                        {
-                            <img src="@capaUrl" alt="Capa do livro @item.Titulo" class="img-capa" />
-                        }
+                        @*
+                           A imagem é puxada dinamicamente pelo título do livro presente no banco de dados.
+                           Ela se ajusta perfeitamente na moldura (configurado via CSS 'livro-capa-img').
+                           Caso a imagem com esse nome exato não exista, usamos o evento onerror
+                           para esconder a imagem quebrada e manter apenas o fundo placeholder e a tag de gênero.
+                        *@
+                        <img src="~/capasImage/@(Uri.EscapeDataString(item.Titulo)).jpg" class="livro-capa-img" alt="Capa de @item.Titulo" onerror="this.style.display='none';" />
 
                         <span class="genero-tag">@item.Genero</span>
                     </div>
@@ -68,7 +43,7 @@
             }
         </div>
 
-        @* Botão Direito para rolagem *@
+        @* Botão Direito *@
         <button class="nav-btn right" onclick="scrollGrid(1)">&#10095;</button>
     </div>
 
@@ -93,10 +68,10 @@
 
 @section Scripts {
     <script>
-        // Função simples para rolar os livros lateralmente na grade
+        // Função simples para rolar os livros lateralmente
         function scrollGrid(direction) {
             const grid = document.getElementById('livrosGrid');
-            const scrollAmount = 300; // Distância da rolagem em pixels
+            const scrollAmount = 300; // Distância da rolagem
             grid.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'
