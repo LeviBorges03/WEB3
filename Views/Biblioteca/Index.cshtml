@@ -26,10 +26,12 @@
                 <div class="livro-card">
                     <div class="livro-capa-placeholder">
                         @*
-                           A imagem é puxada dinamicamente pelo título do livro presente no banco de dados.
-                           Ela se ajusta perfeitamente na moldura (configurado via CSS 'livro-capa-img').
-                           Caso a imagem com esse nome exato não exista, usamos o evento onerror
-                           para esconder a imagem quebrada e manter apenas o fundo placeholder e a tag de gênero.
+                           Carrega as capas da pasta wwwroot/capasImage de forma dinâmica.
+                           A imagem é referenciada pelo exato nome do título da obra (em .jpg).
+                           O CSS 'livro-capa-img' (object-fit: cover) garante que a capa se encaixe
+                           perfeitamente na moldura existente sem distorcer o layout.
+                           O evento 'onerror' oculta a tag <img> em caso de falha no carregamento,
+                           fazendo com que a moldura antiga (com a cor de fundo e a tag de gênero) apareça.
                         *@
                         <img src="~/capasImage/@(Uri.EscapeDataString(item.Titulo)).jpg" class="livro-capa-img" alt="Capa de @item.Titulo" onerror="this.style.display='none';" />
 

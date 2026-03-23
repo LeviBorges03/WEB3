@@ -5,8 +5,11 @@ namespace Biblioteca.Controllers;
 
 public class BibliotecaController : Controller
 {
+    // Ação principal que retorna a lista de livros para a View (Index.cshtml).
     public IActionResult Index()
     {
+        // Cria uma lista de livros instanciando objetos da classe Livro.
+        // O nome da imagem da capa de cada livro em wwwroot/capasImage deve corresponder exatamente à propriedade Titulo.
         List<Livro> l1 = new List<Livro>()
         {
             new Livro { Titulo = "O Alquimista", Autor = "Paulo Coelho", Genero = "Ficção", NumPaginas = 208, DataPublicacao = new DateOnly(1988, 1, 1) },
@@ -23,6 +26,10 @@ public class BibliotecaController : Controller
             new Livro { Titulo = "O Senhor dos Anéis", Autor = "J.R.R. Tolkien", Genero = "Fantasia", NumPaginas = 1216, DataPublicacao = new DateOnly(1954, 7, 29) }
         };
 
-        return View(l1);
+        // Ordena os livros por data de publicação, da mais recente para a mais antiga (descendente)
+        var livrosOrdenados = l1.OrderByDescending(l => l.DataPublicacao).ToList();
+
+        // Envia a lista ordenada para a View responsável por renderizar o HTML (Views/Biblioteca/Index.cshtml)
+        return View(livrosOrdenados);
     }
 }
