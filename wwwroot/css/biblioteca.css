@@ -49,9 +49,12 @@
 
 /* Classe aplicada via JS para expandir o grid e mostrar todos os livros */
 .livros-grid.expandido {
-    flex-wrap: wrap; /* Permite a quebra de linha */
-    justify-content: center; /* Centraliza os livros no grid */
-    overflow-x: hidden; /* Remove o scroll horizontal */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 220px);
+    justify-content: center;
+    gap: 20px;
+    overflow-x: hidden;
+    padding-bottom: 40px;
 }
 
 .livros-grid::-webkit-scrollbar {
@@ -59,7 +62,10 @@
 }
 
 .livro-card {
-    min-width: 220px;
+    width: 220px;
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
     background: var(--white);
     border-radius: 10px;
     box-shadow: var(--shadow);
@@ -109,18 +115,27 @@
 
 .livro-info {
     padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .livro-info h4 {
     margin: 0;
     font-size: 1rem;
     color: var(--primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .livro-info p {
     margin: 5px 0 0;
     color: #7f8c8d;
     font-size: 0.85rem;
+    margin-top: auto;
 }
 
 /* Botões de Navegação */

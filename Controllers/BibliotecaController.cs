@@ -82,7 +82,9 @@ public class BibliotecaController : Controller
             new Livro { Titulo = "Sagarana", Autor = "João Guimarães Rosa", Genero = "Contos", NumPaginas = 384, DataPublicacao = new DateOnly(1946, 1, 1), CorCapa = "#58D68D" },
             new Livro { Titulo = "Laços de Família", Autor = "Clarice Lispector", Genero = "Contos", NumPaginas = 136, DataPublicacao = new DateOnly(1960, 1, 1), CorCapa = "#EC7063" },
             new Livro { Titulo = "O Nome da Rosa", Autor = "Umberto Eco", Genero = "Mistério Histórico", NumPaginas = 512, DataPublicacao = new DateOnly(1980, 1, 1), CorCapa = "#7E5109" },
-            new Livro { Titulo = "O Corvo", Autor = "Edgar Allan Poe", Genero = "Poesia Gótica", NumPaginas = 48, DataPublicacao = new DateOnly(1845, 1, 29), CorCapa = "#1B2631" }
+            new Livro { Titulo = "O Corvo", Autor = "Edgar Allan Poe", Genero = "Poesia Gótica", NumPaginas = 48, DataPublicacao = new DateOnly(1845, 1, 29), CorCapa = "#1B2631" },
+            new Livro { Titulo = "Ensaio sobre a Lucidez", Autor = "José Saramago", Genero = "Alegoria", NumPaginas = 328, DataPublicacao = new DateOnly(2004, 1, 1), CorCapa = "#D35400" },
+            new Livro { Titulo = "A Peste", Autor = "Albert Camus", Genero = "Filosofia", NumPaginas = 308, DataPublicacao = new DateOnly(1947, 1, 1), CorCapa = "#922B21" }
         };
 
         var livrosOrdenados = l1.OrderByDescending(l => l.DataPublicacao).ToList();
