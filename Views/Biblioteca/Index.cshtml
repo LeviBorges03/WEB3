@@ -24,17 +24,11 @@
             @foreach (var item in Model)
             {
                 <div class="livro-card">
-                    <div class="livro-capa-placeholder">
+                    <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                         @*
-                           Carrega as capas da pasta wwwroot/capasImage de forma dinâmica.
-                           A imagem é referenciada pelo exato nome do título da obra (em .jpg).
-                           O CSS 'livro-capa-img' (object-fit: cover) garante que a capa se encaixe
-                           perfeitamente na moldura existente sem distorcer o layout.
-                           O evento 'onerror' oculta a tag <img> em caso de falha no carregamento,
-                           fazendo com que a moldura antiga (com a cor de fundo e a tag de gênero) apareça.
+                           A imagem foi removida de acordo com os requisitos do usuário.
+                           Agora utilizamos a cor suave definida no objeto Livro.
                         *@
-                        <img src="~/capasImage/@(Uri.EscapeDataString(item.Titulo)).jpg" class="livro-capa-img" alt="Capa de @item.Titulo" onerror="this.style.display='none';" />
-
                         <span class="genero-tag">@item.Genero</span>
                     </div>
                     <div class="livro-info">
@@ -47,6 +41,14 @@
 
         @* Botão Direito *@
         <button class="nav-btn right" onclick="scrollGrid(1)">&#10095;</button>
+    </div>
+
+    @* Botão elegante para expandir o catálogo *@
+    <div class="expand-container">
+        <button class="expand-btn" id="expandBtn" onclick="toggleExpand()" aria-label="Expandir catálogo" aria-expanded="false">
+            <span id="expandBtnText">Ver todo o catálogo</span>
+            <span id="expandBtnIcon" class="expand-icon">&#x25BC;</span>
+        </button>
     </div>
 
     <section class="info-secao">
@@ -78,6 +80,36 @@
                 left: direction * scrollAmount,
                 behavior: 'smooth'
             });
+        }
+
+        // Função para expandir o grid e mostrar todos os livros
+        function toggleExpand() {
+            const grid = document.getElementById('livrosGrid');
+            const btn = document.getElementById('expandBtn');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const btnIcon = document.getElementById('expandBtnIcon');
+
+            // Alterna a classe que permite quebrar a linha dos itens
+            grid.classList.toggle('expandido');
+            // Gira a seta 180 graus de forma suave
+            btnIcon.classList.toggle('rodado');
+
+            // Esconde ou exibe os botões de navegação lateral
+            navBtns.forEach(navBtn => {
+                navBtn.classList.toggle('escondido');
+            });
+
+            // Acessibilidade e atualização do texto
+            const btnText = document.getElementById('expandBtnText');
+            if (grid.classList.contains('expandido')) {
+                btn.setAttribute('aria-expanded', 'true');
+                btn.setAttribute('aria-label', 'Recolher catálogo');
+                btnText.innerText = "Recolher catálogo";
+            } else {
+                btn.setAttribute('aria-expanded', 'false');
+                btn.setAttribute('aria-label', 'Expandir catálogo');
+                btnText.innerText = "Ver todo o catálogo";
+            }
         }
     </script>
 }
