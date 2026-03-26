@@ -50,11 +50,18 @@
 /* Classe aplicada via JS para expandir o grid e mostrar todos os livros */
 .livros-grid.expandido {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 220px);
+    /* Usa minmax para preencher toda a largura da tela uniformemente com cards responsivos */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     justify-content: center;
     gap: 20px;
     overflow-x: hidden;
     padding-bottom: 40px;
+}
+
+/* Quando expandido, os cards perdem o tamanho rígido (220px) e ocupam a coluna do grid */
+.livros-grid.expandido .livro-card {
+    width: 100%;
+    flex: none;
 }
 
 .livros-grid::-webkit-scrollbar {
