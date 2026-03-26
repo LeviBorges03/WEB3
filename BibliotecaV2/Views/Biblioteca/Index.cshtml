@@ -1,0 +1,115 @@
+@model List<Biblioteca.Models.Livro>
+
+@{
+    ViewData["Title"] = "Vitrine da Biblioteca";
+}
+
+@section Styles {
+    @* Link para o arquivo CSS que criaremos abaixo *@
+    <link rel="stylesheet" href="~/css/biblioteca.css" />
+}
+
+<div class="page-wrapper">
+    
+    <section class="biblioteca-header">
+        <h2>Nome da Biblioteca</h2>
+    </section>
+
+    <div class="carousel-container">
+        @* Botão Esquerdo *@
+        <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
+
+        @* Grade de Livros com rolagem horizontal *@
+        <div class="livros-grid" id="livrosGrid">
+            @foreach (var item in Model)
+            {
+                <div class="livro-card">
+                    <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
+                        @* 
+                           A imagem foi removida de acordo com os requisitos do usuário.
+                           Agora utilizamos a cor suave definida no objeto Livro.
+                        *@
+                        <span class="genero-tag">@item.Genero</span>
+                    </div>
+                    <div class="livro-info">
+                        <h4>@item.Titulo</h4>
+                        <p>@item.Autor</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* Botão Direito *@
+        <button class="nav-btn right" onclick="scrollGrid(1)">&#10095;</button>
+    </div>
+
+    @* Botão elegante para expandir o catálogo *@
+    <div class="expand-container">
+        <button class="expand-btn" id="expandBtn" onclick="toggleExpand()" aria-label="Expandir catálogo" aria-expanded="false">
+            <span id="expandBtnText">Ver todo o catálogo</span>
+            <span id="expandBtnIcon" class="expand-icon">&#x25BC;</span>
+        </button>
+    </div>
+
+    <section class="info-secao">
+        <div class="info-box">
+            <h3>Sobre a Nossa Biblioteca</h3>
+            <p>Bem-vindo ao nosso acervo digital! Aqui você encontra uma seleção curada de obras para expandir seus horizontes. Nosso objetivo é facilitar o acesso à leitura de forma organizada e moderna.</p>
+        </div>
+
+        <div class="info-extras">
+            <div class="extra-item">
+                <i class="icon">📅</i>
+                <span><strong>Total de Obras:</strong> @Model.Count títulos</span>
+            </div>
+            <div class="extra-item">
+                <i class="icon">💡</i>
+                <span><strong>Dica:</strong> Use as setas laterais para explorar os livros disponíveis.</span>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // Função simples para rolar os livros lateralmente
+        function scrollGrid(direction) {
+            const grid = document.getElementById('livrosGrid');
+            const scrollAmount = 300; // Distância da rolagem
+            grid.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        // Função para expandir o grid e mostrar todos os livros
+        function toggleExpand() {
+            const grid = document.getElementById('livrosGrid');
+            const btn = document.getElementById('expandBtn');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const btnIcon = document.getElementById('expandBtnIcon');
+
+            // Alterna a classe que permite quebrar a linha dos itens
+            grid.classList.toggle('expandido');
+            // Gira a seta 180 graus de forma suave
+            btnIcon.classList.toggle('rodado');
+
+            // Esconde ou exibe os botões de navegação lateral
+            navBtns.forEach(navBtn => {
+                navBtn.classList.toggle('escondido');
+            });
+
+            // Acessibilidade e atualização do texto
+            const btnText = document.getElementById('expandBtnText');
+            if (grid.classList.contains('expandido')) {
+                btn.setAttribute('aria-expanded', 'true');
+                btn.setAttribute('aria-label', 'Recolher catálogo');
+                btnText.innerText = "Recolher catálogo";
+            } else {
+                btn.setAttribute('aria-expanded', 'false');
+                btn.setAttribute('aria-label', 'Expandir catálogo');
+                btnText.innerText = "Ver todo o catálogo";
+            }
+        }
+    </script>
+}
