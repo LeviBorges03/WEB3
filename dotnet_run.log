@@ -10,3 +10,5 @@ info: Microsoft.Hosting.Lifetime[0]
       Content root path: /home/jules/WEB3/BibliotecaV2
 warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
       Failed to determine the https port for redirect.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
