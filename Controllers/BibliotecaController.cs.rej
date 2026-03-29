@@ -1,0 +1,17 @@
+--- BibliotecaController.cs
++++ BibliotecaController.cs
+@@ -90,4 +90,14 @@
+         var livrosOrdenados = l1.OrderByDescending(l => l.DataPublicacao).ToList();
+         return View(livrosOrdenados);
+     }
++
++    public IActionResult Livro()
++    {
++        return View();
++    }
++
++    public IActionResult Autor()
++    {
++        return View();
++    }
+ }

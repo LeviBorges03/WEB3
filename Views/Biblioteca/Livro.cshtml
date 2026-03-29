@@ -1,0 +1,209 @@
+@{
+    ViewData["Title"] = "Detalhes do Livro";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/biblioteca.css" />
+    <style>
+        /* Estilos adicionais para a página do Livro mantendo o padrão biblioteca.css */
+        .biblioteca-header-local {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .biblioteca-header-local h2 {
+            margin: 0;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        /* Hero Section no formato original */
+        .livro-hero {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 40px;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .livro-capa-detalhe {
+            height: 420px;
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .livro-header-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .livro-header-info h1 {
+            font-size: 2.2rem;
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .autor-nome {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+        }
+
+        .meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .meta-item {
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        /* Autor Estilo */
+        .autor-card {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .autor-foto-placeholder {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 2px solid #eee;
+            font-size: 2rem;
+        }
+
+        .autor-bio h4 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .autor-bio p {
+            font-size: 0.85rem;
+            margin: 0;
+            color: #7f8c8d;
+        }
+
+        /* Responsividade */
+        @@media (max-width: 768px) {
+            .livro-hero { grid-template-columns: 1fr; text-align: center; }
+            .livro-capa-detalhe { height: 350px; width: 250px; margin: 0 auto; }
+            .meta-info { justify-content: center; }
+            .autor-card { flex-direction: column; align-items: center; text-align: center; }
+        }
+    </style>
+}
+
+<!-- Bloco de Código Razor para simular variáveis (preparando para o Model) -->
+@{
+    // Variáveis locais para simular o model
+    string tituloLivro = "Dom Casmurro";
+    string nomeAutor = "Machado de Assis";
+    string anoPublicacao = "1899";
+    int paginas = 256;
+    string idioma = "Português";
+    string sinopse = "Bento Santiago, o narrador, conta a história de sua vida, focando em seu relacionamento com Capitu, sua vizinha e amor de infância. O romance explora temas de ciúme, traição e a complexidade da memória humana.";
+    string genero = "Romance / Realismo";
+
+    // Cor de capa simplificada igual ao protótipo
+    string corCapaHex = "#e74c3c";
+}
+
+<div class="page-wrapper">
+    <header class="biblioteca-header-local">
+        <!-- Rota de volta para o Catálogo -->
+        <a href="@Url.Action("Index", "Biblioteca")" class="back-link">
+            ← Voltar ao Catálogo
+        </a>
+        <h2>Detalhes da Obra</h2>
+    </header>
+
+    <main class="livro-detalhe-container">
+        <section class="livro-hero">
+            <!-- Capa do Livro no padrão Index -->
+            <div class="livro-capa-detalhe" style="background-color: @corCapaHex;">
+                <span class="genero-tag">@genero</span>
+            </div>
+
+            <div class="livro-header-info">
+                <h1>@tituloLivro</h1>
+                <p class="autor-nome">Por <strong>@nomeAutor</strong></p>
+
+                <div class="meta-info">
+                    <span class="meta-item"><strong>Publicação:</strong> @anoPublicacao</span>
+                    <span class="meta-item"><strong>Páginas:</strong> @paginas</span>
+                    <span class="meta-item"><strong>Idioma:</strong> @idioma</span>
+                </div>
+
+                <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
+                <div>
+                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reuso da div.info-secao da biblioteca.css -->
+        <section class="info-secao">
+            <div class="info-box">
+                <h3>Sinopse</h3>
+                <p>@sinopse</p>
+                <p>Esta obra destaca-se pela narrativa envolvente e pela profundidade psicológica dos personagens, mantendo seu status como um dos maiores clássicos da literatura.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>Sobre o Autor</h3>
+                <!-- Transformando o card do autor em um link para a página do Autor -->
+                <a href="@Url.Action("Autor", "Biblioteca")" class="autor-card">
+                    <div class="autor-foto-placeholder">
+                        <i class="icon">👤</i>
+                    </div>
+                    <div class="autor-bio">
+                        <h4>@nomeAutor</h4>
+                        <p>Um dos maiores nomes da literatura, fundador da Academia Brasileira de Letras. Clique para ver o perfil completo.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </main>
+</div>
