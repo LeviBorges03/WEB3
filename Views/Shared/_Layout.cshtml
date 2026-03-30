@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Biblioteca.styles.css" asp-append-version="true" />
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -26,10 +23,14 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Biblioteca" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Biblioteca" asp-action="Index">Catálogo Principal (Home)</a>
                         </li>
                         <li class="nav-item">
-
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Biblioteca" asp-action="Livro">Livro Atual</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Biblioteca" asp-action="Autor">Autor Atual</a>
+                        </li>
                     </ul>
                 </div>
             </div>

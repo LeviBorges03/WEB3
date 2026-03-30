@@ -98,6 +98,7 @@
             margin-top: 20px;
             text-decoration: none;
             color: inherit;
+            cursor: pointer;
         }
 
         .autor-foto-placeholder {
@@ -135,21 +136,6 @@
     </style>
 }
 
-<!-- Bloco de Código Razor para simular variáveis (preparando para o Model) -->
-@{
-    // Variáveis locais para simular o model
-    string tituloLivro = "Dom Casmurro";
-    string nomeAutor = "Machado de Assis";
-    string anoPublicacao = "1899";
-    int paginas = 256;
-    string idioma = "Português";
-    string sinopse = "Bento Santiago, o narrador, conta a história de sua vida, focando em seu relacionamento com Capitu, sua vizinha e amor de infância. O romance explora temas de ciúme, traição e a complexidade da memória humana.";
-    string genero = "Romance / Realismo";
-
-    // Cor de capa simplificada igual ao protótipo
-    string corCapaHex = "#e74c3c";
-}
-
 <div class="page-wrapper">
     <header class="biblioteca-header-local">
         <!-- Rota de volta para o Catálogo -->
@@ -162,18 +148,18 @@
     <main class="livro-detalhe-container">
         <section class="livro-hero">
             <!-- Capa do Livro no padrão Index -->
-            <div class="livro-capa-detalhe" style="background-color: @corCapaHex;">
-                <span class="genero-tag">@genero</span>
+            <div class="livro-capa-detalhe" id="livroCapaContainer">
+                <span class="genero-tag" id="livroGenero"></span>
             </div>
 
             <div class="livro-header-info">
-                <h1>@tituloLivro</h1>
-                <p class="autor-nome">Por <strong>@nomeAutor</strong></p>
+                <h1 id="livroTitulo">Título Carregando...</h1>
+                <p class="autor-nome">Por <strong id="livroAutor">Autor Carregando...</strong></p>
 
                 <div class="meta-info">
-                    <span class="meta-item"><strong>Publicação:</strong> @anoPublicacao</span>
-                    <span class="meta-item"><strong>Páginas:</strong> @paginas</span>
-                    <span class="meta-item"><strong>Idioma:</strong> @idioma</span>
+                    <span class="meta-item"><strong>Publicação:</strong> <span id="livroAno">...</span></span>
+                    <span class="meta-item"><strong>Páginas:</strong> <span id="livroPaginas">...</span></span>
+                    <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
@@ -187,23 +173,62 @@
         <section class="info-secao">
             <div class="info-box">
                 <h3>Sinopse</h3>
-                <p>@sinopse</p>
+                <p id="livroSinopse">Carregando sinopse dinâmica da obra baseada na sua seleção... Em breve, mais informações sobre este clássico estarão disponíveis.</p>
                 <p>Esta obra destaca-se pela narrativa envolvente e pela profundidade psicológica dos personagens, mantendo seu status como um dos maiores clássicos da literatura.</p>
             </div>
 
             <div class="info-box">
                 <h3>Sobre o Autor</h3>
-                <!-- Transformando o card do autor em um link para a página do Autor -->
-                <a href="@Url.Action("Autor", "Biblioteca")" class="autor-card">
+                <!-- Clicar no autor dentro da página do livro redirecionará para a view Autor -->
+                <a href="#" class="autor-card" id="linkParaAutor" onclick="abrirAutorDaObra(event)">
                     <div class="autor-foto-placeholder">
                         <i class="icon">👤</i>
                     </div>
                     <div class="autor-bio">
-                        <h4>@nomeAutor</h4>
-                        <p>Um dos maiores nomes da literatura, fundador da Academia Brasileira de Letras. Clique para ver o perfil completo.</p>
+                        <h4 id="boxNomeAutor">...</h4>
+                        <p>Um dos maiores nomes da literatura. Clique para ver o perfil completo e mais publicações.</p>
                     </div>
                 </a>
             </div>
         </section>
     </main>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tenta pegar o livro do LocalStorage
+            const data = localStorage.getItem('livroAtual');
+
+            if (data) {
+                const livro = JSON.parse(data);
+
+                // Injeta os dados no DOM genérico
+                document.getElementById('livroTitulo').innerText = livro.titulo;
+                document.getElementById('livroAutor').innerText = livro.autor;
+                document.getElementById('boxNomeAutor').innerText = livro.autor;
+                document.getElementById('livroCapaContainer').style.backgroundColor = livro.corCapa;
+                document.getElementById('livroGenero').innerText = livro.genero;
+                document.getElementById('livroAno').innerText = livro.ano || 'Desconhecido';
+                document.getElementById('livroPaginas').innerText = livro.paginas || 'N/A';
+
+                // Simular uma sinopse basica baseada no nome
+                document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+            } else {
+                // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
+                document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
+                document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
+            }
+        });
+
+        // Função local para o usuário ir para o Autor estando na página do Livro
+        function abrirAutorDaObra(e) {
+            e.preventDefault();
+            const autorNome = document.getElementById('boxNomeAutor').innerText;
+            if (autorNome && autorNome !== "...") {
+                localStorage.setItem('autorAtual', autorNome);
+                window.location.href = '@Url.Action("Autor", "Biblioteca")';
+            }
+        }
+    </script>
+}

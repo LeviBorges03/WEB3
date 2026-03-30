@@ -140,24 +140,6 @@
     </style>
 }
 
-@{
-    // Variáveis simuladas para o Autor (preparação para Model)
-    string nomeAutor = "Machado de Assis";
-    string tagline = "Mestre do Realismo, Romancista, Contista e Poeta";
-    string dataNascimento = "21 de Junho de 1839 (falecido em 1908)";
-    string naturalidade = "Rio de Janeiro, Brasil";
-    string generos = "Realismo, Romance, Conto";
-
-    // Lista de obras usando cores hexadecimais em vez de imagens, conforme o padrão do catálogo.
-    var obrasDoAutor = new List<dynamic>
-    {
-        new { Titulo = "Dom Casmurro", Genero = "Realismo", CorCapa = "#e74c3c" },
-        new { Titulo = "A Moreninha", Genero = "Romantismo", CorCapa = "#8e44ad" },
-        new { Titulo = "O Alquimista", Genero = "Ficção", CorCapa = "#f39c12" },
-        new { Titulo = "Memórias Póstumas de Brás Cubas", Genero = "Realismo", CorCapa = "#3498db" }
-    };
-}
-
 <div class="page-wrapper">
     <header class="biblioteca-header-local">
         <!-- Rota de volta para o Catálogo -->
@@ -170,24 +152,24 @@
     <main class="perfil-container">
         <section class="autor-hero">
             <div class="autor-foto-grande">
-                <i class="emoji-autor">✍️</i>
+                <i class="emoji-autor" id="autorEmoji">✍️</i>
             </div>
             <div class="autor-essencial">
-                <h1>@nomeAutor</h1>
-                <p class="autor-tagline">@tagline</p>
+                <h1 id="autorNome">Carregando Autor...</h1>
+                <p class="autor-tagline" id="autorTagline">Conheça mais sobre as incríveis obras deste mestre da literatura.</p>
 
                 <div class="autor-metadados">
                     <div class="meta-dado">
                         <span class="rotulo">Nascimento:</span>
-                        <span class="valor">@dataNascimento</span>
+                        <span class="valor" id="autorNascimento">Histórico</span>
                     </div>
                     <div class="meta-dado">
                         <span class="rotulo">Naturalidade:</span>
-                        <span class="valor">@naturalidade</span>
+                        <span class="valor" id="autorLocal">Planeta Terra</span>
                     </div>
                     <div class="meta-dado">
                         <span class="rotulo">Gêneros:</span>
-                        <span class="valor">@generos</span>
+                        <span class="valor" id="autorGeneros">Ficção, Clássico</span>
                     </div>
                 </div>
             </div>
@@ -197,18 +179,17 @@
         <section class="info-secao">
             <div class="info-box">
                 <h3>Sobre o Autor</h3>
-                <p>Joaquim Maria Machado de Assis é amplamente considerado como o maior nome da literatura brasileira. Nascido no Rio de Janeiro, sua vasta obra abrange romances, contos, poesias, crônicas e peças teatrais.</p>
-                <p>Foi o principal expoente do Realismo no Brasil, com a publicação de "Memórias Póstumas de Brás Cubas" (1881). Sua narrativa é caracterizada por um profundo ceticismo, ironia refinada, pessimismo, e uma análise psicológica penetrante dos personagens.</p>
+                <p id="autorBio">Esta é uma página gerada dinamicamente pelo sistema. O autor selecionado é um dos mais proeminentes nomes catalogados na nossa Biblioteca. Suas obras abordam narrativas que cativam e perduram através dos tempos. A vida e trajetória desse escritor(a) continuam sendo motivo de profunda inspiração e pesquisa nas universidades e academias de todo o mundo.</p>
             </div>
 
             <div class="info-extras">
                 <div class="extra-item">
                     <i class="icon">📚</i>
-                    <span><strong>10+ Obras</strong> clássicas publicadas</span>
+                    <span><strong id="autorQtdObras">Múltiplas Obras</strong> clássicas publicadas</span>
                 </div>
                 <div class="extra-item">
                     <i class="icon">🏆</i>
-                    <span><strong>Fundador</strong> da Academia Brasileira de Letras</span>
+                    <span><strong>Membro Imortal</strong> nas Academias Literárias</span>
                 </div>
                 <div class="extra-item">
                     <i class="icon">🌐</i>
@@ -217,25 +198,69 @@
             </div>
         </section>
 
-        <section class="obras-secao">
-            <h3>Obras Publicadas</h3>
+        <section class="obras-secao" id="secaoObras" style="display:none;">
+            <h3>Outras Obras Relacionadas no Catálogo</h3>
 
-            <div class="livros-grid-autor">
-
-                @foreach (var obra in obrasDoAutor)
-                {
-                    <a href="@Url.Action("Livro", "Biblioteca")" class="livro-card livro-card-link" style="width: 100%; flex: none;">
-                        <div class="livro-capa-placeholder" style="background-color: @obra.CorCapa;">
-                            <span class="genero-tag">@obra.Genero</span>
-                        </div>
-                        <div class="livro-info">
-                            <h4>@obra.Titulo</h4>
-                            <p>@nomeAutor</p>
-                        </div>
-                    </a>
-                }
-
+            <div class="livros-grid-autor" id="autorGridLivros">
+                <!-- Javascript irá preencher o grid com livros dinâmicos -->
             </div>
         </section>
     </main>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nomeStr = localStorage.getItem('autorAtual');
+
+            if (nomeStr) {
+                // Injeta o nome do autor principal no template genérico
+                document.getElementById('autorNome').innerText = nomeStr;
+
+                // Brincadeira visual: baseada na letra inicial, colocar um emoji diferente pro autor
+                const inicial = nomeStr.charAt(0).toUpperCase();
+                const emojis = ['👨‍🏫', '👩‍🏫', '🧙‍♂️', '📜', '✍️', '📖'];
+                const indice = nomeStr.length % emojis.length;
+                document.getElementById('autorEmoji').innerText = emojis[indice];
+
+                // Mock Simples: gerar 3 "obras relacionadas" falsas só para visualmente simular a passagem de dados
+                // Num sistema real isso viria de um fetch `/api/autor/${nomeStr}/livros`
+                const container = document.getElementById('autorGridLivros');
+                const coresFalsas = ['#3498db', '#e74c3c', '#f1c40f', '#9b59b6'];
+
+                let mockObras = "";
+                for(let i = 1; i <= 3; i++) {
+                    const randomColor = coresFalsas[i % coresFalsas.length];
+                    const tituloFalso = `Obra Clássica Vol ${i}`;
+                    const generoFalso = "Drama";
+
+                    // Como estamos simulando a navegação encadeada, colocamos o mesmo script 'abrirLivro' da Index aqui!
+                    mockObras += `
+                    <a href="javascript:void(0);" onclick="abrirLivroParaSimulacao('${tituloFalso}', '${nomeStr}', '${randomColor}', '${generoFalso}')" class="livro-card livro-card-link" style="width: 100%; flex: none;">
+                        <div class="livro-capa-placeholder" style="background-color: ${randomColor};">
+                            <span class="genero-tag">${generoFalso}</span>
+                        </div>
+                        <div class="livro-info">
+                            <h4>${tituloFalso}</h4>
+                            <p>${nomeStr}</p>
+                        </div>
+                    </a>
+                    `;
+                }
+
+                container.innerHTML = mockObras;
+                document.getElementById('secaoObras').style.display = 'block';
+
+            } else {
+                document.getElementById('autorNome').innerText = "Autor Não Especificado";
+            }
+        });
+
+        // Função local caso o usuário queira abrir o livro pela tela do Autor
+        function abrirLivroParaSimulacao(titulo, autor, corCapa, genero) {
+            const livroData = { titulo, autor, corCapa, genero, ano: 'Desconhecido', paginas: '300' };
+            localStorage.setItem('livroAtual', JSON.stringify(livroData));
+            window.location.href = '@Url.Action("Livro", "Biblioteca")';
+        }
+    </script>
+}
