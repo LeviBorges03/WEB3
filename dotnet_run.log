@@ -1,7 +1,5 @@
 Using launch settings from Properties/launchSettings.json...
 Building...
-/app/Views/Biblioteca/Index.cshtml(165,55): warning CS8602: Dereference of a possibly null reference. [/app/Biblioteca.csproj]
-/app/Views/Biblioteca/Index.cshtml(165,91): warning CS8602: Dereference of a possibly null reference. [/app/Biblioteca.csproj]
 info: Microsoft.Hosting.Lifetime[14]
       Now listening on: http://localhost:5239
 info: Microsoft.Hosting.Lifetime[0]
@@ -12,3 +10,5 @@ info: Microsoft.Hosting.Lifetime[0]
       Content root path: /app
 warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
       Failed to determine the https port for redirect.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...

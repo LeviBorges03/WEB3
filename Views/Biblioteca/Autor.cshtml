@@ -58,10 +58,7 @@
             box-shadow: var(--shadow);
         }
 
-        /* Sem Emoji: Ocultar o ícone porque o usuário quer apenas a cor de fundo */
-        .emoji-autor {
-            display: none;
-        }
+        .emoji-autor { font-size: 5rem; }
 
         .autor-essencial h1 {
             margin: 0;
@@ -154,8 +151,7 @@
 
     <main class="perfil-container">
         <section class="autor-hero">
-            <!-- A cor do background desta div será alterada pelo JS para ficar idêntica à cor da capa -->
-            <div class="autor-foto-grande" id="autorFotoColorida">
+            <div class="autor-foto-grande">
                 <i class="emoji-autor" id="autorEmoji">✍️</i>
             </div>
             <div class="autor-essencial">
@@ -215,31 +211,20 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const dataStr = localStorage.getItem('autorAtual');
+            const nomeStr = localStorage.getItem('autorAtual');
 
-            if (dataStr) {
-                // Tenta parsear JSON se for um objeto com a cor associada {nome: "autor", cor: "#123"}
-                let nomeAutor = "";
-                let corCapa = "#e0e0e0"; // fallback
+            if (nomeStr) {
+                // Injeta o nome do autor principal no template genérico
+                document.getElementById('autorNome').innerText = nomeStr;
 
-                try {
-                    const parsedData = JSON.parse(dataStr);
-                    if(parsedData.nome) {
-                        nomeAutor = parsedData.nome;
-                        corCapa = parsedData.cor || corCapa;
-                    } else {
-                        nomeAutor = dataStr;
-                    }
-                } catch(e) {
-                    // Antiga compatibilidade onde autorAtual era só uma string "Machado de Assis"
-                    nomeAutor = dataStr;
-                }
-
-                // Aplica Nome e Cor (Removendo os degradês e emojis)
-                document.getElementById('autorNome').innerText = nomeAutor;
-                document.getElementById('autorFotoColorida').style.backgroundColor = corCapa;
+                // Brincadeira visual: baseada na letra inicial, colocar um emoji diferente pro autor
+                const inicial = nomeStr.charAt(0).toUpperCase();
+                const emojis = ['👨‍🏫', '👩‍🏫', '🧙‍♂️', '📜', '✍️', '📖'];
+                const indice = nomeStr.length % emojis.length;
+                document.getElementById('autorEmoji').innerText = emojis[indice];
 
                 // Mock Simples: gerar 3 "obras relacionadas" falsas só para visualmente simular a passagem de dados
+                // Num sistema real isso viria de um fetch `/api/autor/${nomeStr}/livros`
                 const container = document.getElementById('autorGridLivros');
                 const coresFalsas = ['#3498db', '#e74c3c', '#f1c40f', '#9b59b6'];
 
@@ -251,17 +236,15 @@
 
                     // Como estamos simulando a navegação encadeada, colocamos o mesmo script 'abrirLivro' da Index aqui!
                     mockObras += `
-                    <div class="livro-card">
-                        <a href="javascript:void(0);" onclick="abrirLivroParaSimulacao('${tituloFalso}', '${nomeAutor}', '${randomColor}', '${generoFalso}')" class="livro-card-link" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex-grow: 1;">
-                            <div class="livro-capa-placeholder" style="background-color: ${randomColor};">
-                                <span class="genero-tag">${generoFalso}</span>
-                            </div>
-                            <div class="livro-info">
-                                <h4>${tituloFalso}</h4>
-                                <p>${nomeAutor}</p>
-                            </div>
-                        </a>
-                    </div>
+                    <a href="javascript:void(0);" onclick="abrirLivroParaSimulacao('${tituloFalso}', '${nomeStr}', '${randomColor}', '${generoFalso}')" class="livro-card livro-card-link" style="width: 100%; flex: none;">
+                        <div class="livro-capa-placeholder" style="background-color: ${randomColor};">
+                            <span class="genero-tag">${generoFalso}</span>
+                        </div>
+                        <div class="livro-info">
+                            <h4>${tituloFalso}</h4>
+                            <p>${nomeStr}</p>
+                        </div>
+                    </a>
                     `;
                 }
 
