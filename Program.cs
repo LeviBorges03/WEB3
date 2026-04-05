@@ -9,7 +9,7 @@ GetConnectionString("DefaultConnection");
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BibliotecaContext>
     (options => options.UseMySql(connectionString,
-        ServerVersion.AutoDetect(connectionString))
+        new MySqlServerVersion(new Version(8, 0, 40)))
     );
 
 var app = builder.Build();
