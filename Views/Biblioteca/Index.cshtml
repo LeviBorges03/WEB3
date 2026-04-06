@@ -23,6 +23,11 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+
+        <div class="search-controls">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Pesquisar por título, autor ou gênero..." oninput="filterBooks()">
+            <button id="toggleFavBtn" class="pill-btn" onclick="toggleFavoritesFilter()">Mostrar Meus Favoritos</button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -137,5 +142,64 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // --- FILTRO E BUSCA --- //
+        let showingFavorites = false;
+
+        function filterBooks() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            let favoritos = [];
+            try {
+                favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+            } catch (e) {
+                favoritos = [];
+            }
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                const isMatch = titulo.includes(query) || autor.includes(query) || genero.includes(query);
+
+                let isFavoriteMatch = true;
+                if (showingFavorites) {
+                    // Check if current book title is in favorites array
+                    // Since title is unique enough in our mock, we use it as ID
+                    const rawTitulo = card.querySelector('h4').innerText;
+                    isFavoriteMatch = favoritos.includes(rawTitulo);
+                }
+
+                if (isMatch && isFavoriteMatch) {
+                    card.style.display = 'flex'; // Use flex as it is in CSS
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleFavoritesFilter() {
+            showingFavorites = !showingFavorites;
+            const btn = document.getElementById('toggleFavBtn');
+
+            if (showingFavorites) {
+                btn.classList.add('active');
+                btn.innerText = "Mostrar Todos";
+            } else {
+                btn.classList.remove('active');
+                btn.innerText = "Mostrar Meus Favoritos";
+            }
+
+            filterBooks(); // Re-apply filter
+        }
+
+        // Ensure filters are applied if needed when returning to page
+        document.addEventListener('DOMContentLoaded', () => {
+            filterBooks();
+        });
     </script>
 }
