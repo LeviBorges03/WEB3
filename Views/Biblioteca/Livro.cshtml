@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button id="favBtn" class="expand-btn" onclick="toggleFavorite()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -196,12 +196,15 @@
 
 @section Scripts {
     <script>
+        let currentBookTitle = "";
+
         document.addEventListener('DOMContentLoaded', () => {
             // Tenta pegar o livro do LocalStorage
             const data = localStorage.getItem('livroAtual');
 
             if (data) {
                 const livro = JSON.parse(data);
+                currentBookTitle = livro.titulo;
 
                 // Injeta os dados no DOM genérico
                 document.getElementById('livroTitulo').innerText = livro.titulo;
@@ -214,12 +217,56 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                checkFavoriteStatus();
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
             }
         });
+
+        // --- SISTEMA DE FAVORITOS --- //
+        function checkFavoriteStatus() {
+            let favoritos = [];
+            try {
+                favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+            } catch (e) {
+                favoritos = [];
+            }
+
+            const btn = document.getElementById('favBtn');
+            if (favoritos.includes(currentBookTitle)) {
+                btn.innerText = "Remover dos Favoritos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "var(--white)";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            }
+        }
+
+        function toggleFavorite() {
+            if (!currentBookTitle) return;
+
+            let favoritos = [];
+            try {
+                favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+            } catch (e) {
+                favoritos = [];
+            }
+
+            const index = favoritos.indexOf(currentBookTitle);
+            if (index === -1) {
+                favoritos.push(currentBookTitle);
+            } else {
+                favoritos.splice(index, 1);
+            }
+
+            localStorage.setItem('favoritos', JSON.stringify(favoritos));
+            checkFavoriteStatus();
+        }
 
         // Função local para o usuário ir para o Autor estando na página do Livro
         function abrirAutorDaObra(e) {
