@@ -164,7 +164,10 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button id="btnFavorito" class="expand-btn" onclick="toggleFavorito()" style="transition: all 0.3s ease;">
+                        <span id="iconeFavorito" style="margin-right: 5px;">🤍</span>
+                        <span id="textoFavorito">Adicionar aos Favoritos</span>
+                    </button>
                 </div>
             </div>
         </section>
@@ -196,12 +199,17 @@
 
 @section Scripts {
     <script>
+        // Variável global para saber se está favoritado
+        let isFavoritado = false;
+        let livroDataObj = null;
+
         document.addEventListener('DOMContentLoaded', () => {
             // Tenta pegar o livro do LocalStorage
             const data = localStorage.getItem('livroAtual');
 
             if (data) {
                 const livro = JSON.parse(data);
+                livroDataObj = livro;
 
                 // Injeta os dados no DOM genérico
                 document.getElementById('livroTitulo').innerText = livro.titulo;
@@ -214,12 +222,68 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                // Verificar Favoritos
+                verificarStatusFavorito(livro.titulo);
+
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
             }
         });
+
+        function verificarStatusFavorito(tituloLivro) {
+            let favoritos = [];
+            const favs = localStorage.getItem('favoritos');
+            if (favs) {
+                try { favoritos = JSON.parse(favs); } catch(e) {}
+            }
+
+            isFavoritado = favoritos.some(f => f.titulo === tituloLivro);
+            atualizarUIBotaoFavorito();
+        }
+
+        function atualizarUIBotaoFavorito() {
+            const btn = document.getElementById('btnFavorito');
+            const icone = document.getElementById('iconeFavorito');
+            const texto = document.getElementById('textoFavorito');
+
+            if (isFavoritado) {
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'var(--white)';
+                icone.innerText = '❤️';
+                texto.innerText = 'Remover dos Favoritos';
+            } else {
+                btn.style.backgroundColor = 'var(--white)';
+                btn.style.color = 'var(--primary)';
+                icone.innerText = '🤍';
+                texto.innerText = 'Adicionar aos Favoritos';
+            }
+        }
+
+        function toggleFavorito() {
+            if (!livroDataObj) return;
+
+            let favoritos = [];
+            const favs = localStorage.getItem('favoritos');
+            if (favs) {
+                try { favoritos = JSON.parse(favs); } catch(e) {}
+            }
+
+            if (isFavoritado) {
+                favoritos = favoritos.filter(f => f.titulo !== livroDataObj.titulo);
+            } else {
+                favoritos.push({
+                    titulo: livroDataObj.titulo,
+                    autor: livroDataObj.autor
+                });
+            }
+
+            localStorage.setItem('favoritos', JSON.stringify(favoritos));
+            isFavoritado = !isFavoritado;
+            atualizarUIBotaoFavorito();
+        }
 
         // Função local para o usuário ir para o Autor estando na página do Livro
         function abrirAutorDaObra(e) {

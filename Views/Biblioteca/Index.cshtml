@@ -23,6 +23,12 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-filter-container" style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..." style="padding: 10px 20px; border-radius: 30px; border: 1px solid var(--accent); width: 300px; max-width: 100%; outline: none; box-shadow: var(--shadow); transition: box-shadow 0.3s;" onkeyup="filtrarLivros()" />
+            <button id="btnFiltroFavoritos" class="expand-btn" onclick="toggleFiltroFavoritos()" style="margin: 0; padding: 10px 24px;">
+                <span id="filtroFavoritosIcon">🤍</span> Meus Favoritos
+            </button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -114,6 +120,61 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // --- FUNÇÕES DE PESQUISA E FAVORITOS --- //
+        let mostrandoSomenteFavoritos = false;
+
+        function filtrarLivros() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            let favoritos = [];
+            if (mostrandoSomenteFavoritos) {
+                const favs = localStorage.getItem('favoritos');
+                if (favs) {
+                    try { favoritos = JSON.parse(favs); } catch (e) {}
+                }
+            }
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                const correspondePesquisa = titulo.includes(termo) || autor.includes(termo) || genero.includes(termo);
+
+                let correspondeFavorito = true;
+                if (mostrandoSomenteFavoritos) {
+                    // O título original preservando maiúsculas para buscar no localStorage (ou compara tudo lowerCase)
+                    const tituloOriginal = card.querySelector('h4').innerText;
+                    correspondeFavorito = favoritos.some(f => f.titulo === tituloOriginal);
+                }
+
+                if (correspondePesquisa && correspondeFavorito) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleFiltroFavoritos() {
+            mostrandoSomenteFavoritos = !mostrandoSomenteFavoritos;
+            const btn = document.getElementById('btnFiltroFavoritos');
+            const icon = document.getElementById('filtroFavoritosIcon');
+
+            if (mostrandoSomenteFavoritos) {
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'var(--white)';
+                icon.innerText = '❤️';
+            } else {
+                btn.style.backgroundColor = 'var(--white)';
+                btn.style.color = 'var(--primary)';
+                icon.innerText = '🤍';
+            }
+
+            filtrarLivros();
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
