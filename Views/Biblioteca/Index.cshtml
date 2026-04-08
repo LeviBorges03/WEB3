@@ -23,6 +23,14 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+            <input type="text" id="searchInput" placeholder="Buscar por título, autor ou gênero..."
+                   oninput="filtrarLivros()"
+                   style="padding: 10px; width: 60%; max-width: 400px; border-radius: 20px; border: 1px solid var(--accent); outline: none;">
+            <button id="btnVerFavoritos" onclick="toggleFavoritosView()" class="expand-btn" style="padding: 10px 15px; margin: 0; font-size: 0.9rem;">
+                Ver Favoritos
+            </button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -114,6 +122,56 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        let modoFavoritos = false;
+
+        function getFavoritos() {
+            const favs = localStorage.getItem('favoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function toggleFavoritosView() {
+            modoFavoritos = !modoFavoritos;
+            const btn = document.getElementById('btnVerFavoritos');
+            if (modoFavoritos) {
+                btn.innerText = "Mostrar Todos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "var(--white)";
+            } else {
+                btn.innerText = "Ver Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            }
+            filtrarLivros();
+        }
+
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+            const favoritos = getFavoritos();
+
+            cards.forEach(card => {
+                const tituloElement = card.querySelector('h4').innerText;
+                const autorElement = card.querySelector('.autor-link-hover').innerText;
+
+                const titulo = tituloElement.toLowerCase();
+                const autor = autorElement.toLowerCase();
+                const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                let matchQuery = titulo.includes(query) || autor.includes(query) || genero.includes(query);
+
+                if (modoFavoritos) {
+                    const isFav = favoritos.some(f => f.titulo === tituloElement && f.autor === autorElement);
+                    matchQuery = matchQuery && isFav;
+                }
+
+                if (matchQuery) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
