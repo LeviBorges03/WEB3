@@ -100,4 +100,9 @@ public class BibliotecaController : Controller
     {
         return View();
     }
+
+    public IActionResult Favoritos()
+    {
+        return View();
+    }
 }
