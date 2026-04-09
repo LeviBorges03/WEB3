@@ -1,0 +1,151 @@
+@{
+    ViewData["Title"] = "Meus Favoritos";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/biblioteca.css" />
+    <style>
+        .biblioteca-header-local {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .biblioteca-header-local h2 {
+            margin: 0;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .favoritos-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding-bottom: 40px;
+        }
+
+        .livro-card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .empty-state h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+        }
+
+        /* Responsividade */
+        @@media (max-width: 900px) {
+            .favoritos-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @@media (max-width: 650px) {
+            .favoritos-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @@media (max-width: 450px) {
+            .favoritos-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+}
+
+<div class="page-wrapper">
+    <header class="biblioteca-header-local">
+        <a href="@Url.Action("Index", "Biblioteca")" class="back-link">
+            ← Voltar ao Catálogo
+        </a>
+        <h2>Meus Livros Favoritos</h2>
+    </header>
+
+    <main>
+        <div id="favoritosContainer">
+            <!-- Grid de favoritos será renderizado via JavaScript -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>Nenhum favorito ainda!</h3>
+            <p>Explore o catálogo e adicione obras aos seus favoritos.</p>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritosStr = localStorage.getItem('favoritos');
+            const favoritosContainer = document.getElementById('favoritosContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (favoritosStr && favoritosStr !== "[]") {
+                const favoritos = JSON.parse(favoritosStr);
+
+                let gridHTML = '<div class="favoritos-grid">';
+
+                favoritos.forEach(livro => {
+                    gridHTML += `
+                        <div class="livro-card">
+                            <a href="javascript:void(0);" onclick="abrirLivro('${livro.titulo}', '${livro.autor}', '${livro.corCapa}', '${livro.genero}', '${livro.ano}', '${livro.paginas}')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                                <div class="livro-capa-placeholder" style="background-color: ${livro.corCapa};">
+                                    <span class="genero-tag">${livro.genero}</span>
+                                </div>
+                                <div class="livro-info">
+                                    <h4>${livro.titulo}</h4>
+                                    <div onclick="abrirAutor(event, '${livro.autor}')">
+                                        <p class="autor-link-hover">${livro.autor}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                });
+
+                gridHTML += '</div>';
+                favoritosContainer.innerHTML = gridHTML;
+            } else {
+                emptyState.style.display = 'block';
+            }
+        });
+
+        // Reuso das funções de navegação
+        function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
+            const livroData = { titulo, autor, corCapa, genero, ano, paginas };
+            localStorage.setItem('livroAtual', JSON.stringify(livroData));
+            window.location.href = '@Url.Action("Livro", "Biblioteca")';
+        }
+
+        function abrirAutor(event, nomeAutor) {
+            event.stopPropagation();
+            event.preventDefault();
+            localStorage.setItem('autorAtual', nomeAutor);
+            window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+    </script>
+}
