@@ -268,3 +268,83 @@
     .nav-btn { display: none; } /* Em celulares, o usuário apenas arrasta com o dedo */
     .livros-grid { overflow-x: scroll; }
 }
+/* --- BARRA DE PESQUISA E FILTROS --- */
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+}
+
+.filter-btn {
+    background: var(--bg-light);
+    border: 2px solid #ddd;
+    color: var(--primary);
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.filter-btn.ativo {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+}
+
+/* --- BOTÃO FAVORITO --- */
+.btn-favoritar {
+    background: var(--white);
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-favoritar:hover {
+    background: #fdf2f1;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(231, 76, 60, 0.3);
+}
+
+.btn-favoritar.favoritado {
+    background: #e74c3c;
+    color: var(--white);
+}
+
+.btn-favoritar.favoritado:hover {
+    background: #c0392b;
+}

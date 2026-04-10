@@ -25,7 +25,12 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
-    <div class="carousel-container">
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título, autor ou gênero..." onkeyup="filtrarLivros()">
+        <button id="btnFiltroFavoritos" class="filter-btn" onclick="toggleFiltroFavoritos()">❤️ Mostrar Apenas Favoritos</button>
+    </div>
+
+    <div class="carousel-container" id="carouselContainer">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
 
@@ -137,5 +142,90 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        let mostrarApenasFavoritos = false;
+
+        function toggleFiltroFavoritos() {
+            mostrarApenasFavoritos = !mostrarApenasFavoritos;
+            const btn = document.getElementById('btnFiltroFavoritos');
+
+            if (mostrarApenasFavoritos) {
+                btn.classList.add('ativo');
+                btn.innerHTML = '❤️ Mostrando Favoritos';
+            } else {
+                btn.classList.remove('ativo');
+                btn.innerHTML = '❤️ Mostrar Apenas Favoritos';
+            }
+
+            filtrarLivros();
+        }
+
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            let favoritos = [];
+            if (mostrarApenasFavoritos) {
+                try {
+                    favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+                } catch (e) {
+                    favoritos = [];
+                }
+            }
+
+            let achouAlgum = false;
+
+            cards.forEach(card => {
+                // Pega os dados a partir do link clicável para facilitar (já que contém todos os dados p/ abrirLivro)
+                const tituloElem = card.querySelector('h4');
+                const autorElem = card.querySelector('.autor-link-hover');
+                const generoElem = card.querySelector('.genero-tag');
+
+                const titulo = tituloElem ? tituloElem.innerText.toLowerCase() : "";
+                const autor = autorElem ? autorElem.innerText.toLowerCase() : "";
+                const genero = generoElem ? generoElem.innerText.toLowerCase() : "";
+
+                // Texto de busca
+                const matchesSearch = titulo.includes(input) || autor.includes(input) || genero.includes(input);
+
+                // Favoritos
+                let matchesFavorito = true;
+                if (mostrarApenasFavoritos) {
+                    // Considera favorito se o título original exato estiver no array de favoritos
+                    const tituloOriginal = tituloElem ? tituloElem.innerText : "";
+                    matchesFavorito = favoritos.includes(tituloOriginal);
+                }
+
+                if (matchesSearch && matchesFavorito) {
+                    card.style.display = 'flex'; // ou 'block', flex pra manter o layout
+                    achouAlgum = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Se o usuário começar a pesquisar/filtrar, automaticamente expande o grid para não ficar em formato de carrossel
+            const grid = document.getElementById('livrosGrid');
+            const navBtns = document.querySelectorAll('.nav-btn');
+
+            if (input !== "" || mostrarApenasFavoritos) {
+                if (!grid.classList.contains('expandido')) {
+                    // Força expansão
+                    toggleExpand();
+                }
+                // Oculta os botões de navegação lateral caso ainda estejam visíveis
+                navBtns.forEach(btn => btn.style.display = 'none');
+            } else if (input === "" && !mostrarApenasFavoritos && grid.classList.contains('expandido')) {
+                // Restaura os botões caso tenha voltado ao estado normal (opcional)
+                navBtns.forEach(btn => btn.style.display = 'block');
+            }
+        }
+
+        // Dispara ao carregar a página caso tenha valor na busca (ex: reload)
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('searchInput').value !== "") {
+                filtrarLivros();
+            }
+        });
     </script>
 }
