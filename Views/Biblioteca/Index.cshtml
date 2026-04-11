@@ -23,6 +23,10 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..." oninput="filtrarLivros()" style="width: 50%; padding: 12px 24px; border-radius: 30px; border: 2px solid var(--accent); font-size: 1rem; outline: none; box-shadow: var(--shadow); transition: all 0.3s;" />
+            <button id="btnFavoritos" onclick="toggleFiltroFavoritos()" style="padding: 12px 24px; border-radius: 30px; border: 2px solid var(--accent); background-color: var(--white); color: var(--primary); font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: var(--shadow); transition: all 0.3s;">Mostrar Favoritos</button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -137,5 +141,61 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        let filtroFavoritosAtivo = false;
+
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            // Auto expandir o grid se houver pesquisa ou filtro de favoritos
+            if (filter.length > 0 || filtroFavoritosAtivo) {
+                if (!grid.classList.contains('expandido')) {
+                    toggleExpand();
+                }
+            }
+
+            let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+            for (let i = 0; i < cards.length; i++) {
+                const titulo = cards[i].querySelector('h4').innerText.toLowerCase();
+                const autor = cards[i].querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = cards[i].querySelector('.genero-tag').innerText.toLowerCase();
+                const tituloOriginal = cards[i].querySelector('h4').innerText;
+
+                let matchesSearch = titulo.includes(filter) || autor.includes(filter) || genero.includes(filter);
+                let matchesFavorito = !filtroFavoritosAtivo || favoritos.includes(tituloOriginal);
+
+                if (matchesSearch && matchesFavorito) {
+                    cards[i].style.display = "flex";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+
+        function toggleFiltroFavoritos() {
+            filtroFavoritosAtivo = !filtroFavoritosAtivo;
+            const btn = document.getElementById('btnFavoritos');
+
+            if (filtroFavoritosAtivo) {
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'var(--white)';
+                btn.innerText = 'Mostrar Todos';
+            } else {
+                btn.style.backgroundColor = 'var(--white)';
+                btn.style.color = 'var(--primary)';
+                btn.innerText = 'Mostrar Favoritos';
+            }
+
+            filtrarLivros();
+        }
+
+        // Aplicar o filtro na inicialização caso a barra de busca tenha ficado com texto no reload
+        document.addEventListener("DOMContentLoaded", function() {
+            filtrarLivros();
+        });
     </script>
 }
