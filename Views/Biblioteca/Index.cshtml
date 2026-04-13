@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px;">
+            <input type="text" id="searchInput" placeholder="Pesquisar livros por título, autor ou gênero..." style="width: 100%; max-width: 400px; padding: 10px; border-radius: 20px; border: 1px solid var(--accent); box-shadow: var(--shadow); outline: none;" oninput="filtrarLivros()" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -113,6 +116,28 @@
                 btn.setAttribute('aria-expanded', 'false');
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
+            }
+        }
+
+        // Função de filtro para a barra de pesquisa
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                // Busca nos textos dos elementos daquele card
+                const title = card.querySelector('.livro-info h4').innerText.toLowerCase();
+                const author = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genre = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                if (title.includes(filter) || author.includes(filter) || genre.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
             }
         }
 
