@@ -23,6 +23,12 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-bar-container" style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título ou autor..." oninput="filtrarLivros()" style="padding: 10px 20px; border-radius: 30px; border: 1px solid #ccc; width: 60%; max-width: 400px; outline: none; font-size: 1rem;" />
+            <button id="btnFavoritos" class="expand-btn" onclick="toggleFavoritos()" style="margin: 0; padding: 10px 20px;">
+                <span id="btnFavoritosIcon">🤍</span> Favoritos
+            </button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -90,6 +96,61 @@
             const grid = document.getElementById('livrosGrid');
             const scrollAmount = 300;
             grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        let mostrandoFavoritos = false;
+
+        function filtrarLivros() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            // Pega favoritos do localStorage
+            const favoritosStr = localStorage.getItem('favoritos');
+            let favoritos = [];
+            if (favoritosStr) {
+                try {
+                    favoritos = JSON.parse(favoritosStr);
+                    if (!Array.isArray(favoritos)) favoritos = [];
+                } catch (e) {
+                    favoritos = [];
+                }
+            }
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const tituloOriginal = card.querySelector('h4').innerText;
+
+                const matchTexto = titulo.includes(termo) || autor.includes(termo);
+                const isFavorito = favoritos.includes(tituloOriginal);
+
+                if (mostrandoFavoritos) {
+                    if (matchTexto && isFavorito) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                } else {
+                    if (matchTexto) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function toggleFavoritos() {
+            mostrandoFavoritos = !mostrandoFavoritos;
+            const btnIcon = document.getElementById('btnFavoritosIcon');
+
+            if (mostrandoFavoritos) {
+                btnIcon.innerText = '❤️';
+            } else {
+                btnIcon.innerText = '🤍';
+            }
+
+            filtrarLivros();
         }
 
         // Função para expandir o grid e mostrar todos os livros
