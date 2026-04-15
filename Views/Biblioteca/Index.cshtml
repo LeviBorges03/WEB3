@@ -21,9 +21,16 @@
 
 <div class="page-wrapper">
 
+
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+
+        <div class="search-filter-container" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..." oninput="filtrarLivros()" style="padding: 10px; border-radius: 20px; border: 1px solid var(--accent); width: 300px; max-width: 100%;">
+            <button id="btnFavoritos" class="expand-btn" onclick="toggleFiltroFavoritos()" style="margin: 0; padding: 10px 20px; font-size: 0.9rem;">⭐ Mostrar Favoritos</button>
+        </div>
     </section>
+
 
     <div class="carousel-container">
         @* Botão Esquerdo *@
@@ -86,6 +93,55 @@
 @section Scripts {
     <script>
         // Função simples para rolar os livros lateralmente
+        let mostrandoFavoritos = false;
+
+        function toggleFiltroFavoritos() {
+            mostrandoFavoritos = !mostrandoFavoritos;
+            const btn = document.getElementById('btnFavoritos');
+
+            if (mostrandoFavoritos) {
+                btn.innerHTML = "📚 Mostrar Todos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "var(--white)";
+            } else {
+                btn.innerHTML = "⭐ Mostrar Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            }
+
+            filtrarLivros();
+        }
+
+        function getFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+            const favoritos = getFavoritos();
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                const matchBusca = titulo.includes(query) || autor.includes(query) || genero.includes(query);
+
+                // Pra saber se eh favorito, eu pego o titulo (nesta demo simples o titulo e a chave, mas ideally seria um ID)
+                // Usar o titulo exato do h4 mas com os casing original seria melhor, pra simplificar usamos ignoreCase pra verificar
+                const originalTitle = card.querySelector('h4').innerText;
+                const matchFavorito = mostrandoFavoritos ? favoritos.includes(originalTitle) : true;
+
+                if (matchBusca && matchFavorito) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         function scrollGrid(direction) {
             const grid = document.getElementById('livrosGrid');
             const scrollAmount = 300;
