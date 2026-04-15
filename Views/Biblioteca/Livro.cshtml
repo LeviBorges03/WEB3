@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavoritar" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -214,6 +214,8 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                updateButtonState(livro.titulo);
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
@@ -222,6 +224,50 @@
         });
 
         // Função local para o usuário ir para o Autor estando na página do Livro
+
+        // Favorites logic
+        function getFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function setFavoritos(favs) {
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        }
+
+        function isFavorito(titulo) {
+            return getFavoritos().includes(titulo);
+        }
+
+        function updateButtonState(titulo) {
+            const btn = document.getElementById('btnFavoritar');
+            if (!btn) return;
+
+            if (isFavorito(titulo)) {
+                btn.innerText = "Remover dos Favoritos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "var(--white)";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            }
+        }
+
+        function toggleFavorito() {
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (titulo === "Título Carregando..." || titulo === "Nenhum Livro Selecionado") return;
+
+            let favs = getFavoritos();
+            if (favs.includes(titulo)) {
+                favs = favs.filter(t => t !== titulo);
+            } else {
+                favs.push(titulo);
+            }
+            setFavoritos(favs);
+            updateButtonState(titulo);
+        }
+
         function abrirAutorDaObra(e) {
             e.preventDefault();
             const autorNome = document.getElementById('boxNomeAutor').innerText;
