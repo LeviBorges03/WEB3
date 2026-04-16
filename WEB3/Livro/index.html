@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritar" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,60 @@
         </div>
     </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tenta pegar o livro do LocalStorage para manter a paridade com Livro.cshtml, ou usa um valor padrão
+        const data = localStorage.getItem('livroAtual');
+        let titulo = "O Mistério do Código Eterno"; // fallback caso não exista
+
+        if (data) {
+            const livro = JSON.parse(data);
+            titulo = livro.titulo;
+            // Atualiza a tela estática com os dados do JS (opcional, para consistência)
+            document.querySelector('.livro-header-info h1').innerText = titulo;
+            document.querySelector('.autor-nome strong').innerText = livro.autor;
+        }
+
+        atualizarBotaoFavorito(titulo);
+    });
+
+    function atualizarBotaoFavorito(titulo) {
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const btn = document.getElementById('btnFavoritar');
+        if (favoritos.includes(titulo)) {
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--accent)";
+            btn.style.color = "var(--white)";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = "var(--white)";
+            btn.style.color = "var(--primary)";
+        }
+    }
+
+    function toggleFavorito() {
+        const data = localStorage.getItem('livroAtual');
+        let titulo = "O Mistério do Código Eterno";
+
+        if (data) {
+            const livro = JSON.parse(data);
+            titulo = livro.titulo;
+        }
+
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const index = favoritos.indexOf(titulo);
+
+        if (index > -1) {
+            favoritos.splice(index, 1);
+        } else {
+            favoritos.push(titulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        atualizarBotaoFavorito(titulo);
+    }
+</script>
 
 </body>
 </html>
