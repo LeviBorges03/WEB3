@@ -23,6 +23,10 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+
+        <div class="search-container">
+            <input type="text" id="searchBar" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." class="search-input" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -113,6 +117,24 @@
                 btn.setAttribute('aria-expanded', 'false');
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
+            }
+        }
+
+        // Função de Pesquisa em Tempo Real
+        function filtrarLivros() {
+            const input = document.getElementById('searchBar');
+            const filtro = input.value.toLowerCase();
+            const cards = document.getElementsByClassName('livro-card');
+
+            for (let i = 0; i < cards.length; i++) {
+                const titulo = cards[i].querySelector('h4').innerText.toLowerCase();
+                const autor = cards[i].querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(filtro) || autor.includes(filtro)) {
+                    cards[i].style.display = 'flex';
+                } else {
+                    cards[i].style.display = 'none';
+                }
             }
         }
 
