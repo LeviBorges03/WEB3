@@ -25,6 +25,35 @@
     border-bottom: 3px solid var(--accent);
     display: inline-block;
     padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* --- ESTILO DA BARRA DE PESQUISA --- */
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.search-input::placeholder {
+    color: #a0a0a0;
 }
 
 /* --- ESTILO DO CARROSSEL --- */
