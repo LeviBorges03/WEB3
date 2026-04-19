@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button id="btnFavorito" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,41 @@
         </div>
     </main>
 </div>
+
+<script>
+    // Título fixado neste arquivo estático de prototipação (para fim de testes)
+    const tituloFixo = "O Mistério do Código Eterno";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Configurar o estado inicial do botão de favoritos
+        const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const btn = document.getElementById('btnFavorito');
+        if (favoritos.includes(tituloFixo)) {
+            btn.innerText = "Remover dos Favoritos";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+        }
+    });
+
+    // --- FUNÇÃO: Sistema de Favoritos (Versão Protótipo) --- //
+    function toggleFavorito() {
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const index = favoritos.indexOf(tituloFixo);
+        const btn = document.getElementById('btnFavorito');
+
+        if (index > -1) {
+            // Se já é favorito, remova
+            favoritos.splice(index, 1);
+            btn.innerText = "Adicionar aos Favoritos";
+        } else {
+            // Se não é, adicione
+            favoritos.push(tituloFixo);
+            btn.innerText = "Remover dos Favoritos";
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+    }
+</script>
 
 </body>
 </html>
