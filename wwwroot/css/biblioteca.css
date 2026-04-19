@@ -27,6 +27,32 @@
     padding-bottom: 10px;
 }
 
+/* Estilos para a barra de pesquisa */
+.search-container {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.search-input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 25px;
+    border-radius: 50px; /* Pill-shaped per user preference */
+    border: 2px solid #e0e0e0;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--white);
+    color: var(--primary);
+}
+
+.search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+}
+
 /* --- ESTILO DO CARROSSEL --- */
 .carousel-container {
     position: relative;
