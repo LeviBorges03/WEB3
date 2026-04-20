@@ -23,6 +23,10 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-bar-container" style="margin-top: 20px; display: flex; justify-content: center; gap: 15px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar livros, autores ou gêneros..." oninput="filtrarLivros()" style="padding: 10px 20px; width: 300px; border-radius: 20px; border: 1px solid #ccc; font-size: 1rem; outline: none;">
+            <button id="btnFiltroFavoritos" class="expand-btn" onclick="toggleFiltroFavoritos()" style="padding: 10px 20px;">Meus Favoritos</button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -136,6 +140,55 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        let mostrarApenasFavoritos = false;
+
+        function toggleFiltroFavoritos() {
+            mostrarApenasFavoritos = !mostrarApenasFavoritos;
+            const btn = document.getElementById('btnFiltroFavoritos');
+
+            if (mostrarApenasFavoritos) {
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'white';
+            } else {
+                btn.style.backgroundColor = 'var(--white)';
+                btn.style.color = 'var(--primary)';
+            }
+
+            filtrarLivros();
+        }
+
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            let favoritos = [];
+            const favStr = localStorage.getItem('bibliotecaFavoritos');
+            if (favStr) {
+                try {
+                    favoritos = JSON.parse(favStr);
+                } catch (e) {
+                    favoritos = [];
+                }
+            }
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                const correspondeBusca = titulo.includes(query) || autor.includes(query) || genero.includes(query);
+
+                const tituloOriginal = card.querySelector('h4').innerText;
+                const ehFavorito = favoritos.includes(tituloOriginal);
+
+                if (correspondeBusca && (!mostrarApenasFavoritos || ehFavorito)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
