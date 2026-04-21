@@ -16,6 +16,23 @@
             color: var(--primary);
             text-decoration: underline;
         }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 20px;
+            border: 2px solid var(--accent);
+            border-radius: 30px;
+            outline: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            transform: translateY(-2px);
+        }
     </style>
 }
 
@@ -23,6 +40,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container" style="margin-top: 15px;">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título ou autor..." aria-label="Pesquisar livros" oninput="filtrarLivros()" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -114,6 +134,24 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // --- FUNÇÃO DE PESQUISA --- //
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(filter) || autor.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
