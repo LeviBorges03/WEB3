@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button id="btnFavorito" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -214,12 +214,46 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                // Verificar estado inicial dos favoritos
+                let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+                const btn = document.getElementById('btnFavorito');
+                if (favoritos.includes(livro.titulo)) {
+                    btn.innerText = "Remover dos Favoritos";
+                    btn.style.backgroundColor = "var(--accent)";
+                    btn.style.color = "var(--white)";
+                }
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
             }
         });
+
+        function toggleFavorito() {
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (!titulo || titulo === "Nenhum Livro Selecionado") return;
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const index = favoritos.indexOf(titulo);
+            const btn = document.getElementById('btnFavorito');
+
+            if (index > -1) {
+                // Remover dos favoritos
+                favoritos.splice(index, 1);
+                btn.innerText = "Adicionar aos Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            } else {
+                // Adicionar aos favoritos
+                favoritos.push(titulo);
+                btn.innerText = "Remover dos Favoritos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "var(--white)";
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
 
         // Função local para o usuário ir para o Autor estando na página do Livro
         function abrirAutorDaObra(e) {
