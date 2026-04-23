@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavoritar" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -214,12 +214,47 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                verificarStatusFavorito(livro.titulo);
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
             }
         });
+
+        function getFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function verificarStatusFavorito(titulo) {
+            const favoritos = getFavoritos();
+            const btn = document.getElementById('btnFavoritar');
+            if (favoritos.includes(titulo)) {
+                btn.innerText = "Remover dos Favoritos";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+            }
+        }
+
+        function toggleFavorito() {
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (!titulo || titulo === "Nenhum Livro Selecionado" || titulo === "Título Carregando...") return;
+
+            let favoritos = getFavoritos();
+            const btn = document.getElementById('btnFavoritar');
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(t => t !== titulo);
+                btn.innerText = "Adicionar aos Favoritos";
+            } else {
+                favoritos.push(titulo);
+                btn.innerText = "Remover dos Favoritos";
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
 
         // Função local para o usuário ir para o Autor estando na página do Livro
         function abrirAutorDaObra(e) {
