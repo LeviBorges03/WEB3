@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 60%; max-width: 500px; border-radius: 20px; border: 1px solid var(--accent); font-size: 1rem; outline: none; box-shadow: var(--shadow);" oninput="filtrarLivros()" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -93,11 +96,15 @@
         }
 
         // Função para expandir o grid e mostrar todos os livros
-        function toggleExpand() {
+        function toggleExpand(forcarExpandir = false) {
             const grid = document.getElementById('livrosGrid');
             const btn = document.getElementById('expandBtn');
             const navBtns = document.querySelectorAll('.nav-btn');
             const btnIcon = document.getElementById('expandBtnIcon');
+
+            if (forcarExpandir && grid.classList.contains('expandido')) {
+                return; // Já está expandido, não faz nada
+            }
 
             grid.classList.toggle('expandido');
             btnIcon.classList.toggle('rodado');
@@ -114,6 +121,30 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // Função para pesquisar livros
+        function filtrarLivros() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const livros = document.querySelectorAll('.livro-card');
+
+            let temFiltro = searchInput.length > 0;
+
+            if (temFiltro) {
+                // Se o usuário digitou algo, força a expansão do catálogo para mostrar todos os resultados
+                toggleExpand(true);
+            }
+
+            livros.forEach(livro => {
+                const titulo = livro.querySelector('h4').innerText.toLowerCase();
+                const autor = livro.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(searchInput) || autor.includes(searchInput)) {
+                    livro.style.display = 'flex';
+                } else {
+                    livro.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
