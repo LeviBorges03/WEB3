@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button id="btnFavorito" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,40 @@
     </main>
 </div>
 
+<script>
+    const mockTitulo = "O Mistério do Código Eterno";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarBotaoFavorito();
+    });
+
+    function atualizarBotaoFavorito() {
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+        const btn = document.getElementById('btnFavorito');
+
+        if (favoritos.includes(mockTitulo)) {
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.backgroundColor = '#3498db';
+            btn.style.color = 'white';
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = '#ffffff';
+            btn.style.color = '#2c3e50';
+        }
+    }
+
+    function toggleFavorito() {
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+        if (favoritos.includes(mockTitulo)) {
+            favoritos = favoritos.filter(f => f !== mockTitulo);
+        } else {
+            favoritos.push(mockTitulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        atualizarBotaoFavorito();
+    }
+</script>
 </body>
 </html>
