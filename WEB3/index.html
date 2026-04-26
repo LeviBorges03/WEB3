@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Clássicos - Biblioteca</title>
+    <link rel="stylesheet" href="Livro/style.css">
+    <style>
+        .autor-link-hover {
+            transition: color 0.2s;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        .autor-link-hover:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px; /* Pill-shaped design */
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(44, 62, 80, 0.2);
+        }
+        /* Estilos do index que faltam no Livro/style.css */
+        .carousel-container { position: relative; padding: 0 50px; margin-bottom: 30px; }
+        .livros-grid { display: flex; overflow-x: auto; gap: 20px; padding: 10px 0; scroll-behavior: smooth; }
+        .livros-grid.expandido { flex-wrap: wrap; overflow-x: visible; }
+        .livros-grid::-webkit-scrollbar { display: none; }
+        .livro-card { flex: 0 0 250px; background: var(--white); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); transition: transform 0.3s; }
+        .livro-card:hover { transform: translateY(-5px); }
+        .livro-capa-placeholder { height: 350px; position: relative; display: flex; align-items: flex-end; padding: 15px; }
+        .genero-tag { background: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; color: var(--primary); }
+        .livro-info { padding: 15px; }
+        .livro-info h4 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        .livro-info p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: var(--white); border: none; border-radius: 50%; width: 40px; height: 40px; box-shadow: var(--shadow); cursor: pointer; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .nav-btn.left { left: 0; }
+        .nav-btn.right { right: 0; }
+        .nav-btn.escondido { display: none; }
+        .expand-container { text-align: center; margin: 30px 0; }
+        .expand-btn { background: var(--white); color: var(--primary); border: 2px solid var(--accent); padding: 10px 25px; border-radius: 25px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+        .expand-btn:hover { background: var(--accent); color: var(--white); transform: translateY(-2px); }
+        .expand-icon { transition: transform 0.3s; }
+        .expand-icon.rodado { transform: rotate(180deg); }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <section class="biblioteca-header">
+        <h2>Catálogo de Clássicos</h2>
+    </section>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título, autor ou gênero..." oninput="filtrarLivros()" />
+    </div>
+
+    <div class="carousel-container">
+        <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
+
+        <div class="livros-grid" id="livrosGrid">
+            <!-- Mock items for prototype -->
+            <div class="livro-card">
+                <a href="Livro/index.html" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                    <div class="livro-capa-placeholder" style="background-color: #3498db;">
+                        <span class="genero-tag">Ficção Científica</span>
+                    </div>
+                    <div class="livro-info">
+                        <h4>O Mistério do Código Eterno</h4>
+                        <div onclick="abrirAutor(event, 'Clarice Inspira')">
+                            <p class="autor-link-hover">Clarice Inspira</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="livro-card">
+                <a href="Livro/index.html" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                    <div class="livro-capa-placeholder" style="background-color: #e74c3c;">
+                        <span class="genero-tag">Romance</span>
+                    </div>
+                    <div class="livro-info">
+                        <h4>A Moreninha</h4>
+                        <div onclick="abrirAutor(event, 'Joaquim Manuel de Macedo')">
+                            <p class="autor-link-hover">Joaquim Manuel de Macedo</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <button class="nav-btn right" onclick="scrollGrid(1)">&#10095;</button>
+    </div>
+
+    <div class="expand-container">
+        <button class="expand-btn" id="expandBtn" onclick="toggleExpand()" aria-label="Expandir catálogo" aria-expanded="false">
+            <span id="expandBtnText">Ver todo o catálogo</span>
+            <span id="expandBtnIcon" class="expand-icon">&#x25BC;</span>
+        </button>
+    </div>
+
+</div>
+
+<script>
+    function scrollGrid(direction) {
+        const grid = document.getElementById('livrosGrid');
+        const scrollAmount = 300;
+        grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+
+    function toggleExpand() {
+        const grid = document.getElementById('livrosGrid');
+        const btn = document.getElementById('expandBtn');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const btnIcon = document.getElementById('expandBtnIcon');
+
+        grid.classList.toggle('expandido');
+        btnIcon.classList.toggle('rodado');
+
+        navBtns.forEach(navBtn => navBtn.classList.toggle('escondido'));
+
+        const btnText = document.getElementById('expandBtnText');
+        if (grid.classList.contains('expandido')) {
+            btn.setAttribute('aria-expanded', 'true');
+            btn.setAttribute('aria-label', 'Recolher catálogo');
+            btnText.innerText = "Recolher catálogo";
+        } else {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'Expandir catálogo');
+            btnText.innerText = "Ver todo o catálogo";
+        }
+    }
+
+    function filtrarLivros() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const cards = document.querySelectorAll('.livro-card');
+
+        cards.forEach(card => {
+            const titulo = card.querySelector('h4').textContent.toLowerCase();
+            const autor = card.querySelector('.autor-link-hover').textContent.toLowerCase();
+            const genero = card.querySelector('.genero-tag').textContent.toLowerCase();
+
+            if (titulo.includes(filter) || autor.includes(filter) || genero.includes(filter)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function abrirAutor(event, nomeAutor) {
+        event.stopPropagation();
+        event.preventDefault();
+        window.location.href = 'Autor/index.html';
+    }
+</script>
+</body>
+</html>
