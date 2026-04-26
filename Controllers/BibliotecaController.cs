@@ -5,11 +5,9 @@ namespace Biblioteca.Controllers;
 
 public class BibliotecaController : Controller
 {
-    public IActionResult Index()
+    private static readonly List<Livro> _livrosCatalog = new List<Livro>()
     {
-        List<Livro> l1 = new List<Livro>()
-        {
-            new Livro { Titulo = "O Alquimista", Autor = "Paulo Coelho", Genero = "Ficção", NumPaginas = 208, DataPublicacao = new DateOnly(1988, 1, 1), CorCapa = "#D4AF37" },
+        new Livro { Titulo = "O Alquimista", Autor = "Paulo Coelho", Genero = "Ficção", NumPaginas = 208, DataPublicacao = new DateOnly(1988, 1, 1), CorCapa = "#D4AF37" },
             new Livro { Titulo = "Harry Potter and the Prisoner of Azkaban", Autor = "J.K. Rowling", Genero = "Fantasia", NumPaginas = 317, DataPublicacao = new DateOnly(1999, 7, 8), CorCapa = "#4A235A" },
             new Livro { Titulo = "Dom Casmurro", Autor = "Machado de Assis", Genero = "Romance", NumPaginas = 256, DataPublicacao = new DateOnly(1899, 1, 1), CorCapa = "#2C3E50" },
             new Livro { Titulo = "A Culpa é das Estrelas", Autor = "John Green", Genero = "Romance", NumPaginas = 313, DataPublicacao = new DateOnly(2012, 1, 10), CorCapa = "#3498DB" },
@@ -83,11 +81,13 @@ public class BibliotecaController : Controller
             new Livro { Titulo = "Laços de Família", Autor = "Clarice Lispector", Genero = "Contos", NumPaginas = 136, DataPublicacao = new DateOnly(1960, 1, 1), CorCapa = "#EC7063" },
             new Livro { Titulo = "O Nome da Rosa", Autor = "Umberto Eco", Genero = "Mistério Histórico", NumPaginas = 512, DataPublicacao = new DateOnly(1980, 1, 1), CorCapa = "#7E5109" },
             new Livro { Titulo = "O Corvo", Autor = "Edgar Allan Poe", Genero = "Poesia Gótica", NumPaginas = 48, DataPublicacao = new DateOnly(1845, 1, 29), CorCapa = "#1B2631" },
-            new Livro { Titulo = "Ensaio sobre a Lucidez", Autor = "José Saramago", Genero = "Alegoria", NumPaginas = 328, DataPublicacao = new DateOnly(2004, 1, 1), CorCapa = "#D35400" },
-            new Livro { Titulo = "A Peste", Autor = "Albert Camus", Genero = "Filosofia", NumPaginas = 308, DataPublicacao = new DateOnly(1947, 1, 1), CorCapa = "#922B21" }
-        };
+        new Livro { Titulo = "Ensaio sobre a Lucidez", Autor = "José Saramago", Genero = "Alegoria", NumPaginas = 328, DataPublicacao = new DateOnly(2004, 1, 1), CorCapa = "#D35400" },
+        new Livro { Titulo = "A Peste", Autor = "Albert Camus", Genero = "Filosofia", NumPaginas = 308, DataPublicacao = new DateOnly(1947, 1, 1), CorCapa = "#922B21" }
+    };
 
-        var livrosOrdenados = l1.OrderByDescending(l => l.DataPublicacao).ToList();
+    public IActionResult Index()
+    {
+        var livrosOrdenados = _livrosCatalog.OrderByDescending(l => l.DataPublicacao).ToList();
         return View(livrosOrdenados);
     }
 

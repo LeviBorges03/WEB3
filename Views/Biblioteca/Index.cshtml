@@ -16,6 +16,25 @@
             color: var(--primary);
             text-decoration: underline;
         }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px; /* Pill-shaped design */
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(44, 62, 80, 0.2);
+        }
     </style>
 }
 
@@ -24,6 +43,10 @@
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
     </section>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título, autor ou gênero..." oninput="filtrarLivros()" />
+    </div>
 
     <div class="carousel-container">
         @* Botão Esquerdo *@
@@ -136,6 +159,26 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função para filtrar os livros
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                // O card possui informações de título (h4), autor (p) e gênero (.genero-tag)
+                const titulo = card.querySelector('h4').textContent.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').textContent.toLowerCase();
+                const genero = card.querySelector('.genero-tag').textContent.toLowerCase();
+
+                if (titulo.includes(filter) || autor.includes(filter) || genero.includes(filter)) {
+                    card.style.display = 'flex'; // Usando 'flex' explícito conforme a memória
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
