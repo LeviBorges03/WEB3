@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <input type="text" id="inputPesquisa" oninput="filtrarLivros()" placeholder="Pesquisar por título, autor ou gênero..." style="width: 100%; max-width: 500px; padding: 12px 20px; border-radius: 30px; border: 2px solid var(--accent); font-size: 1rem; outline: none; transition: box-shadow 0.3s ease-in-out; box-shadow: var(--shadow);" onfocus="this.style.boxShadow='0 6px 16px rgba(52, 152, 219, 0.3)'" onblur="this.style.boxShadow='var(--shadow)'" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -136,6 +139,41 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função para filtrar os livros
+        function filtrarLivros() {
+            const input = document.getElementById('inputPesquisa');
+            const filter = input.value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            // Expande o grid automaticamente se estiver pesquisando algo
+            const btn = document.getElementById('expandBtn');
+            const btnIcon = document.getElementById('expandBtnIcon');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const btnText = document.getElementById('expandBtnText');
+
+            if (filter.length > 0 && !grid.classList.contains('expandido')) {
+                grid.classList.add('expandido');
+                btnIcon.classList.add('rodado');
+                navBtns.forEach(navBtn => navBtn.classList.add('escondido'));
+                btn.setAttribute('aria-expanded', 'true');
+                btn.setAttribute('aria-label', 'Recolher catálogo');
+                btnText.innerText = "Recolher catálogo";
+            }
+
+            for (let i = 0; i < cards.length; i++) {
+                const titulo = cards[i].querySelector('h4').innerText.toLowerCase();
+                const autor = cards[i].querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = cards[i].querySelector('.genero-tag').innerText.toLowerCase();
+
+                if (titulo.indexOf(filter) > -1 || autor.indexOf(filter) > -1 || genero.indexOf(filter) > -1) {
+                    cards[i].style.display = 'flex';
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
         }
     </script>
 }
