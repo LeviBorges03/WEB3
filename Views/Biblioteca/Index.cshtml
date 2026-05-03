@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container" style="margin-top: 15px; display: flex; justify-content: center;">
+            <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px 15px; width: 100%; max-width: 400px; border: 2px solid var(--accent); border-radius: 20px; font-size: 1rem; outline: none; transition: box-shadow 0.3s;" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -90,6 +93,30 @@
             const grid = document.getElementById('livrosGrid');
             const scrollAmount = 300;
             grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        // Função para filtrar os livros
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            // Se tiver algo escrito, expandir o grid automaticamente se não estiver
+            if (filter.length > 0 && !grid.classList.contains('expandido')) {
+                toggleExpand();
+            }
+
+            for (let i = 0; i < cards.length; i++) {
+                const title = cards[i].querySelector('h4').innerText.toLowerCase();
+                const author = cards[i].querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (title.indexOf(filter) > -1 || author.indexOf(filter) > -1) {
+                    cards[i].style.display = 'flex'; // Usar flex em vez de '' (vazio) para renderização correta
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
         }
 
         // Função para expandir o grid e mostrar todos os livros
