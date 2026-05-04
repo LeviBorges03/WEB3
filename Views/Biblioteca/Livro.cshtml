@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -230,5 +230,42 @@
                 window.location.href = '@Url.Action("Autor", "Biblioteca")';
             }
         }
+
+        function checkFavoritoStatus() {
+            const data = localStorage.getItem('livroAtual');
+            if (data) {
+                const livro = JSON.parse(data);
+                const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+                const btnFavorito = document.getElementById('btnFavorito');
+                if (favoritos.includes(livro.titulo)) {
+                    btnFavorito.innerText = "Remover dos Favoritos";
+                } else {
+                    btnFavorito.innerText = "Adicionar aos Favoritos";
+                }
+            }
+        }
+
+        function toggleFavorito() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+
+            const livro = JSON.parse(data);
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const index = favoritos.indexOf(livro.titulo);
+
+            if (index !== -1) {
+                // Remover dos favoritos
+                favoritos.splice(index, 1);
+            } else {
+                // Adicionar aos favoritos
+                favoritos.push(livro.titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            checkFavoritoStatus();
+        }
+
+        // Chamar checkFavoritoStatus após o carregamento da página
+        document.addEventListener('DOMContentLoaded', checkFavoritoStatus);
     </script>
 }

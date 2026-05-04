@@ -23,6 +23,12 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+            <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 300px; border-radius: 20px; border: 1px solid #ccc; outline: none;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="favoritosFilter" onclick="filtrarLivros()"> Apenas Favoritos
+            </label>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -136,6 +142,28 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        function filtrarLivros() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const favoritosFilter = document.getElementById('favoritosFilter').checked;
+            const livros = document.querySelectorAll('.livro-card');
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+            livros.forEach(livro => {
+                const titulo = livro.querySelector('h4').innerText.toLowerCase();
+                const tituloOriginal = livro.querySelector('h4').innerText;
+                const autor = livro.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                const matchesSearch = titulo.includes(searchInput) || autor.includes(searchInput);
+                const matchesFavorito = !favoritosFilter || favoritos.includes(tituloOriginal);
+
+                if (matchesSearch && matchesFavorito) {
+                    livro.style.display = 'flex';
+                } else {
+                    livro.style.display = 'none';
+                }
+            });
         }
     </script>
 }
