@@ -23,6 +23,11 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center;">
+            <input type="text" id="pesquisaLivro" placeholder="Pesquisar por título, autor ou gênero..."
+                   style="width: 100%; max-width: 400px; padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; outline: none; transition: border-color 0.3s;"
+                   onfocus="this.style.borderColor='var(--accent)';" onblur="this.style.borderColor='#ccc';">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -137,5 +142,34 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // Logic for filtering books by search input
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputPesquisa = document.getElementById('pesquisaLivro');
+            const grid = document.getElementById('livrosGrid');
+            const navBtns = document.querySelectorAll('.nav-btn');
+
+            inputPesquisa.oninput = function() {
+                const termo = this.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.livro-card');
+
+                // When searching, expand the grid to show results properly
+                if (termo !== "" && !grid.classList.contains('expandido')) {
+                    toggleExpand();
+                }
+
+                cards.forEach(card => {
+                    const titulo = card.querySelector('h4').innerText.toLowerCase();
+                    const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                    const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                    if (titulo.includes(termo) || autor.includes(termo) || genero.includes(termo)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+        });
     </script>
 }
