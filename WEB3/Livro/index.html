@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,47 @@
     </main>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Obter titulo para mock local
+        const titulo = document.querySelector('h1').innerText;
+        atualizarBotaoFavorito(titulo);
+    });
+
+    // Lógica de Favoritos
+    function obterFavoritos() {
+        return JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+    }
+
+    function atualizarBotaoFavorito(titulo) {
+        const favoritos = obterFavoritos();
+        const btn = document.getElementById('btnFavorito');
+        if (btn) {
+            if (favoritos.includes(titulo)) {
+                btn.innerText = "Remover dos Favoritos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "white";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            }
+        }
+    }
+
+    function toggleFavorito() {
+        const titulo = document.querySelector('h1').innerText;
+        let favoritos = obterFavoritos();
+
+        if (favoritos.includes(titulo)) {
+            favoritos = favoritos.filter(f => f !== titulo);
+        } else {
+            favoritos.push(titulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        atualizarBotaoFavorito(titulo);
+    }
+</script>
 </body>
 </html>
