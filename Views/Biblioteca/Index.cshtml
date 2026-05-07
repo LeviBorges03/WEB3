@@ -16,6 +16,10 @@
             color: var(--primary);
             text-decoration: underline;
         }
+        .search-container { margin-top: 20px; display: flex; justify-content: center; }
+        .search-input { width: 100%; max-width: 500px; padding: 12px 24px; font-size: 1rem; border: 2px solid var(--accent); border-radius: 30px; outline: none; transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out; box-shadow: var(--shadow); background-color: var(--white); color: var(--primary); }
+        .search-input:focus { box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3); transform: translateY(-2px); border-color: var(--primary); }
+        .search-input::placeholder { color: #95a5a6; }
     </style>
 }
 
@@ -23,6 +27,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar livros por título ou autor..." oninput="filtrarLivros()" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -136,6 +143,21 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+        function filtrarLivros() {
+            const termoBusca = document.getElementById('searchInput').value.toLowerCase();
+            const livros = document.querySelectorAll('.livro-card');
+
+            livros.forEach(livro => {
+                const titulo = livro.querySelector('h4').innerText.toLowerCase();
+                const autor = livro.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(termoBusca) || autor.includes(termoBusca)) {
+                    livro.style.display = 'flex';
+                } else {
+                    livro.style.display = 'none';
+                }
+            });
         }
     </script>
 }
