@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container" style="margin-top: 15px; text-align: center;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..." style="padding: 10px; width: 60%; max-width: 500px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 1rem;" oninput="filtrarLivros()">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -136,6 +139,37 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função para filtrar livros na barra de pesquisa
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            // Se o usuário começar a pesquisar, expandir automaticamente para ver os resultados
+            if (filter.length > 0 && !grid.classList.contains('expandido')) {
+                toggleExpand();
+            }
+
+            for (let i = 0; i < cards.length; i++) {
+                const titleElement = cards[i].querySelector('h4');
+                const authorElement = cards[i].querySelector('.autor-link-hover');
+                const genreElement = cards[i].querySelector('.genero-tag');
+
+                const titleText = titleElement ? titleElement.textContent || titleElement.innerText : "";
+                const authorText = authorElement ? authorElement.textContent || authorElement.innerText : "";
+                const genreText = genreElement ? genreElement.textContent || genreElement.innerText : "";
+
+                const contentText = titleText + " " + authorText + " " + genreText;
+
+                if (contentText.toLowerCase().indexOf(filter) > -1) {
+                    cards[i].style.display = 'flex';
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
         }
     </script>
 }
