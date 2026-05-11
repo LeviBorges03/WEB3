@@ -25,6 +25,14 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <!-- Search and Favorites Filter Container -->
+    <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; gap: 10px;">
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." class="form-control" style="max-width: 400px; text-align: center;">
+        <label style="cursor: pointer;">
+            <input type="checkbox" id="chkFavoritos" onchange="filtrarLivros()"> Mostrar apenas Favoritos
+        </label>
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -136,6 +144,44 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função para filtrar os livros por texto (título/autor) e/ou favoritos
+        function filtrarLivros() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const mostrarFavoritos = document.getElementById('chkFavoritos').checked;
+
+            let favoritos = [];
+            if (mostrarFavoritos) {
+                const favsJson = localStorage.getItem('bibliotecaFavoritos');
+                if (favsJson) {
+                    try {
+                        favoritos = JSON.parse(favsJson);
+                    } catch(e) {
+                        favoritos = [];
+                    }
+                }
+            }
+
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText;
+                const autor = card.querySelector('.autor-link-hover').innerText;
+                const textMatch = titulo.toLowerCase().includes(searchTerm) || autor.toLowerCase().includes(searchTerm);
+
+                let favMatch = true;
+                if (mostrarFavoritos) {
+                    favMatch = favoritos.includes(titulo);
+                }
+
+                if (textMatch && favMatch) {
+                    // Use flex since .livro-card is flex-based
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
