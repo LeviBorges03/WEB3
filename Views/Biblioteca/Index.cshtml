@@ -23,6 +23,7 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <input type="text" id="pesquisaLivros" class="form-control" style="margin-top: 15px; border-radius: 20px; padding: 10px 20px; width: 100%; max-width: 400px;" placeholder="Pesquisar livros por título..." oninput="filtrarLivros()">
     </section>
 
     <div class="carousel-container">
@@ -33,9 +34,11 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@Html.Raw(System.Web.HttpUtility.HtmlEncode(item.Titulo))">
                     <!-- Link clicável e script JS embutido no onclick -->
-                    <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                    <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column; position: relative;">
+                        <!-- Ícone de favorito (Estrela) inserido via JS caso esteja favoritado -->
+                        <div class="livro-favorito-icon" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; color: #f1c40f; display: none;">★</div>
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
                         </div>
@@ -137,5 +140,42 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // Função de pesquisa em tempo real
+        function filtrarLivros() {
+            const input = document.getElementById('pesquisaLivros').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const tituloElement = card.querySelector('h4');
+                if (tituloElement) {
+                    const titulo = tituloElement.innerText.toLowerCase();
+                    if (titulo.includes(input)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo');
+
+                // Usando html decoding simples no client side porque o server fez HtmlEncode no atributo
+                const txt = document.createElement("textarea");
+                txt.innerHTML = titulo;
+                const tituloDecoded = txt.value;
+
+                if (tituloDecoded && favoritos.includes(tituloDecoded)) {
+                    const favIcon = card.querySelector('.livro-favorito-icon');
+                    if (favIcon) favIcon.style.display = 'block';
+                }
+            });
+        });
     </script>
 }
