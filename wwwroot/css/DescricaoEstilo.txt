@@ -36,3 +36,7 @@ Para que o código não vire uma bagunça:
 * **Variáveis CSS:** Todas as cores principais devem estar no `:root`. Nunca escreva a cor `#3498db` direto no meio do código, use `var(--accent)`.
 * **Comentários:** Cada seção do CSS deve começar com um comentário de bloco (Ex: `/* --- CARROSSEL --- */`).
 * **Responsividade:** O layout deve "quebrar" para uma coluna simples quando a largura da tela for menor que `768px`.
+
+7. Elementos Funcionais e Interativos
+* **Pesquisa:** Barra de busca elegante, com cantos arredondados (`border-radius: 20px`), servindo como filtro em tempo real.
+* **Favoritos:** Botão reutilizável `.expand-btn` alternando dinamicamente, acompanhado de um ícone flutuante (`.livro-favorito-icon`) com a cor dourada (`#f1c40f`) no cartão do livro (`.livro-card`) quando salvo na memória do navegador.
