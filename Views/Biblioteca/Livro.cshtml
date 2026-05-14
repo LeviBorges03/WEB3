@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="favoritoBtn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -219,7 +219,39 @@
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
             }
+
+            atualizarBotaoFavorito();
         });
+
+        function atualizarBotaoFavorito() {
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (titulo === "Nenhum Livro Selecionado" || titulo === "Título Carregando...") return;
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const btn = document.getElementById('favoritoBtn');
+
+            if (favoritos.includes(titulo)) {
+                btn.innerText = "Remover dos Favoritos";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+            }
+        }
+
+        function toggleFavorito() {
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (titulo === "Nenhum Livro Selecionado" || titulo === "Título Carregando...") return;
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(f => f !== titulo);
+            } else {
+                favoritos.push(titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            atualizarBotaoFavorito();
+        }
 
         // Função local para o usuário ir para o Autor estando na página do Livro
         function abrirAutorDaObra(e) {
