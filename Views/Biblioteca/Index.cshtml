@@ -23,6 +23,12 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <input type="text" id="inputPesquisa" placeholder="Pesquisar por título ou autor..." style="padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent); width: 300px; max-width: 100%;" oninput="filtrarLivros()" />
+            <button id="btnFiltroFavoritos" class="expand-btn" style="padding: 8px 15px; font-size: 0.9rem;" onclick="toggleFiltroFavoritos()">
+                Mostrar Favoritos
+            </button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -115,6 +121,63 @@
                 btnText.innerText = "Ver todo o catálogo";
             }
         }
+
+        // --- FILTRO DE PESQUISA E FAVORITOS --- //
+        let mostrandoApenasFavoritos = false;
+
+        function toggleFiltroFavoritos() {
+            mostrandoApenasFavoritos = !mostrandoApenasFavoritos;
+            const btn = document.getElementById('btnFiltroFavoritos');
+
+            if (mostrandoApenasFavoritos) {
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'var(--white)';
+                btn.innerText = 'Mostrar Todos';
+            } else {
+                btn.style.backgroundColor = 'var(--white)';
+                btn.style.color = 'var(--primary)';
+                btn.innerText = 'Mostrar Favoritos';
+            }
+
+            filtrarLivros();
+        }
+
+        function filtrarLivros() {
+            const termoPesquisa = document.getElementById('inputPesquisa').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            let favoritos = [];
+            try {
+                favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            } catch (e) {
+                favoritos = [];
+            }
+
+            cards.forEach(card => {
+                const tituloElem = card.querySelector('.livro-info h4');
+                const autorElem = card.querySelector('.autor-link-hover');
+
+                const titulo = tituloElem ? tituloElem.innerText.toLowerCase() : '';
+                const tituloOriginal = tituloElem ? tituloElem.innerText : '';
+                const autor = autorElem ? autorElem.innerText.toLowerCase() : '';
+
+                const correspondePesquisa = titulo.includes(termoPesquisa) || autor.includes(termoPesquisa);
+                const correspondeFavorito = mostrandoApenasFavoritos ? favoritos.includes(tituloOriginal) : true;
+
+                if (correspondePesquisa && correspondeFavorito) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Adiciona um listener para atualizar a visualização caso os favoritos mudem em outra página
+        window.addEventListener('pageshow', function() {
+            if(mostrandoApenasFavoritos) {
+                filtrarLivros();
+            }
+        });
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
         function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
