@@ -25,6 +25,12 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
+        <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..."
+               style="width: 100%; max-width: 500px; padding: 10px 20px; border-radius: 30px; border: 2px solid var(--accent); font-size: 1rem; outline: none; transition: box-shadow 0.3s; box-shadow: var(--shadow);"
+               oninput="filterBooks()" />
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -90,6 +96,23 @@
             const grid = document.getElementById('livrosGrid');
             const scrollAmount = 300;
             grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        // Função para filtrar os livros
+        function filterBooks() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                // Recuperamos o texto do card, que inclui título, autor e gênero (neste caso oculto visualmente ou não)
+                const text = card.innerText.toLowerCase();
+                if (text.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // Função para expandir o grid e mostrar todos os livros

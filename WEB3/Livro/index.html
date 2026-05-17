@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritos" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,49 @@
         </div>
     </main>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // No protótipo WEB3, usaremos o título fixo do HTML
+        const titulo = document.querySelector('h1').innerText;
+        atualizarBotaoFavorito(titulo);
+    });
+
+    // Funções para o sistema de Favoritos (Protótipo WEB3)
+    function obterFavoritos() {
+        const favs = localStorage.getItem('bibliotecaFavoritos');
+        return favs ? JSON.parse(favs) : [];
+    }
+
+    function atualizarBotaoFavorito(titulo) {
+        const favs = obterFavoritos();
+        const btn = document.getElementById('btnFavoritos');
+
+        if (favs.includes(titulo)) {
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--accent)";
+            btn.style.color = "var(--white)";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = "var(--white)";
+            btn.style.color = "var(--primary)";
+        }
+    }
+
+    function toggleFavorito() {
+        const titulo = document.querySelector('h1').innerText;
+        let favs = obterFavoritos();
+
+        if (favs.includes(titulo)) {
+            favs = favs.filter(f => f !== titulo);
+        } else {
+            favs.push(titulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        atualizarBotaoFavorito(titulo);
+    }
+</script>
 
 </body>
 </html>
