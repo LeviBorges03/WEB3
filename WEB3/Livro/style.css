@@ -116,6 +116,18 @@ body {
     box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
 }
 
+.expand-btn.favoritado {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: var(--white);
+}
+
+.expand-btn.favoritado:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+    box-shadow: 0 6px 16px rgba(231, 76, 60, 0.3);
+}
+
 /* Seção de Informações Inferior */
 .info-secao {
     display: grid;
