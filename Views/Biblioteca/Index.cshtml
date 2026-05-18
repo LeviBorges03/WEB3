@@ -25,6 +25,11 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <!-- Barra de Pesquisa -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título, autor ou gênero..." oninput="filtrarLivros()">
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -136,6 +141,24 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função de pesquisa
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const livros = document.querySelectorAll('.livro-card');
+
+            livros.forEach(livro => {
+                const titulo = livro.querySelector('h4').innerText.toLowerCase();
+                const autor = livro.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = livro.querySelector('.genero-tag').innerText.toLowerCase();
+
+                if (titulo.includes(query) || autor.includes(query) || genero.includes(query)) {
+                    livro.style.display = 'flex';
+                } else {
+                    livro.style.display = 'none';
+                }
+            });
         }
     </script>
 }
