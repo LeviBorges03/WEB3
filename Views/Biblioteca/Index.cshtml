@@ -25,6 +25,11 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+
+    <div class="search-container" style="margin-bottom: 20px;">
+        <input type="text" id="pesquisaInput" oninput="filtrarLivros()" placeholder="Pesquisar livros por título ou autor..." style="padding: 12px; width: 100%; border-radius: 30px; border: 1px solid #ccc; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -114,6 +119,24 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+
+        // --- FUNÇÃO DE PESQUISA --- //
+        function filtrarLivros() {
+            const input = document.getElementById('pesquisaInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(input) || autor.includes(input)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
