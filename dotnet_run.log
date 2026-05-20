@@ -1,5 +1,7 @@
-Using launch settings from Properties/launchSettings.json...
+Using launch settings from /app/Properties/launchSettings.json...
 Building...
+warn: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[35]
+      No XML encryptor configured. Key {b915c55b-1192-4ae7-a615-663af4f3c9c4} may be persisted to storage in unencrypted form.
 info: Microsoft.Hosting.Lifetime[14]
       Now listening on: http://localhost:5239
 info: Microsoft.Hosting.Lifetime[0]
@@ -10,5 +12,3 @@ info: Microsoft.Hosting.Lifetime[0]
       Content root path: /app
 warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
       Failed to determine the https port for redirect.
-info: Microsoft.Hosting.Lifetime[0]
-      Application is shutting down...
