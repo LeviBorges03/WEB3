@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px;">
+            <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 100%; max-width: 400px; border: 1px solid var(--accent); border-radius: 20px; outline: none; box-shadow: var(--shadow);" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -136,6 +139,24 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função de pesquisa
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('.livro-info h4')?.innerText.toLowerCase() || "";
+                const autor = card.querySelector('.livro-info .autor-link-hover')?.innerText.toLowerCase() || "";
+
+                if (titulo.includes(filter) || autor.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
