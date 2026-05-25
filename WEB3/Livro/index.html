@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritos" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,64 @@
     </main>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Use a dynamic title lookup based on localStorage or fallback for this static view
+        const data = localStorage.getItem('livroAtual');
+        let tituloAtual = "O Mistério do Código Eterno"; // fallback
+        if (data) {
+            try {
+                const livro = JSON.parse(data);
+                if (livro && livro.titulo) {
+                    tituloAtual = livro.titulo;
+                }
+            } catch(e) {}
+        }
+        atualizarBotaoFavorito(tituloAtual);
+    });
+
+    function obterFavoritos() {
+        const favStr = localStorage.getItem('bibliotecaFavoritos');
+        return favStr ? JSON.parse(favStr) : [];
+    }
+
+    function atualizarBotaoFavorito(titulo) {
+        const favs = obterFavoritos();
+        const btn = document.getElementById('btnFavoritos');
+        if (favs.includes(titulo)) {
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--accent)";
+            btn.style.color = "var(--white)";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = "var(--white)";
+            btn.style.color = "var(--primary)";
+        }
+    }
+
+    function toggleFavorito() {
+        const data = localStorage.getItem('livroAtual');
+        let titulo = "O Mistério do Código Eterno"; // fallback
+        if (data) {
+            try {
+                const livro = JSON.parse(data);
+                if (livro && livro.titulo) {
+                    titulo = livro.titulo;
+                }
+            } catch(e) {}
+        }
+
+        let favs = obterFavoritos();
+
+        if (favs.includes(titulo)) {
+            favs = favs.filter(t => t !== titulo);
+        } else {
+            favs.push(titulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        atualizarBotaoFavorito(titulo);
+    }
+</script>
 </body>
 </html>
