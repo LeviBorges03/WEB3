@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Clássicos - Biblioteca</title>
+    <link rel="stylesheet" href="Autor/Autor.css">
+    <style>
+        /* --- SEARCH AND FILTER --- */
+        .search-filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            color: var(--primary);
+            background: transparent;
+            min-width: 250px;
+        }
+
+        .search-input::placeholder {
+            color: #95a5a6;
+        }
+
+        .favoritos-filter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .favoritos-filter-label input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <section class="biblioteca-header">
+        <h2>Catálogo de Clássicos</h2>
+    </section>
+
+    <!-- Search Bar & Favorites Filter -->
+    <div class="search-filter-container">
+        <input type="text" id="searchInput" class="search-input" oninput="filtrarLivros()" placeholder="Pesquisar por título, autor ou gênero..." />
+        <label class="favoritos-filter-label">
+            <input type="checkbox" id="cbMostrarFavoritos" onchange="filtrarLivros()" /> Mostrar apenas favoritos
+        </label>
+    </div>
+
+    <div class="carousel-container">
+        <div class="livros-grid expandido" id="livrosGrid">
+
+            <div class="livro-card">
+                <a href="Livro/index.html" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                    <div class="livro-capa-placeholder" style="background-color: #D4AF37;">
+                        <span class="genero-tag">Ficção</span>
+                    </div>
+                    <div class="livro-info">
+                        <h4>O Alquimista</h4>
+                        <div>
+                            <p class="autor-link-hover">Paulo Coelho</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="livro-card">
+                <a href="Livro/index.html" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                    <div class="livro-capa-placeholder" style="background-color: #4A235A;">
+                        <span class="genero-tag">Fantasia</span>
+                    </div>
+                    <div class="livro-info">
+                        <h4>Harry Potter and the Prisoner of Azkaban</h4>
+                        <div>
+                            <p class="autor-link-hover">J.K. Rowling</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function filtrarLivros() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const mostrarFavoritos = document.getElementById('cbMostrarFavoritos').checked;
+        const livros = document.querySelectorAll('.livro-card');
+
+        let favoritos = [];
+        if (mostrarFavoritos) {
+            favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        }
+
+        livros.forEach(card => {
+            const titulo = card.querySelector('h4').innerText.toLowerCase();
+            const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+            const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+            const matchesSearch = titulo.includes(query) || autor.includes(query) || genero.includes(query);
+
+            let matchesFavorito = true;
+            if (mostrarFavoritos) {
+                const originalTitulo = card.querySelector('h4').innerText;
+                matchesFavorito = favoritos.includes(originalTitulo);
+            }
+
+            if (matchesSearch && matchesFavorito) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+</body>
+</html>
