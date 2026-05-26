@@ -25,6 +25,14 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <!-- Search Bar & Favorites Filter -->
+    <div class="search-filter-container">
+        <input type="text" id="searchInput" class="search-input" oninput="filtrarLivros()" placeholder="Pesquisar por título, autor ou gênero..." />
+        <label class="favoritos-filter-label">
+            <input type="checkbox" id="cbMostrarFavoritos" onchange="filtrarLivros()" /> Mostrar apenas favoritos
+        </label>
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -114,6 +122,39 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // Função para filtrar livros (Pesquisa & Favoritos)
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const mostrarFavoritos = document.getElementById('cbMostrarFavoritos').checked;
+            const livros = document.querySelectorAll('.livro-card');
+
+            // Get favoritos from localStorage if needed
+            let favoritos = [];
+            if (mostrarFavoritos) {
+                favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            }
+
+            livros.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = card.querySelector('.genero-tag').innerText.toLowerCase();
+
+                const matchesSearch = titulo.includes(query) || autor.includes(query) || genero.includes(query);
+
+                let matchesFavorito = true;
+                if (mostrarFavoritos) {
+                    const originalTitulo = card.querySelector('h4').innerText; // get original case for matching
+                    matchesFavorito = favoritos.includes(originalTitulo);
+                }
+
+                if (matchesSearch && matchesFavorito) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //

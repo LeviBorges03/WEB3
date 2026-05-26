@@ -190,3 +190,13 @@ body {
     .meta-info { justify-content: center; }
     .autor-card { flex-direction: column; align-items: center; text-align: center; }
 }
+/* Botão Favoritado Ativo */
+.expand-btn.favoritado {
+    background: var(--accent);
+    color: var(--white);
+}
+
+.expand-btn.favoritado:hover {
+    background: #2980b9;
+    box-shadow: 0 6px 16px rgba(41, 128, 185, 0.4);
+}

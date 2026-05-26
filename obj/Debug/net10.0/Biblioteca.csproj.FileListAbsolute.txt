@@ -301,8 +301,6 @@
 /app/obj/Debug/net10.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
 /app/obj/Debug/net10.0/scopedcss/bundle/Biblioteca.styles.css
 /app/obj/Debug/net10.0/scopedcss/projectbundle/Biblioteca.bundle.scp.css
-/app/obj/Debug/net10.0/compressed/x707g6crvw-{0}-ur0znzxbxy-ur0znzxbxy.gz
-/app/obj/Debug/net10.0/compressed/m9nrbdxmup-{0}-fzj60igq24-fzj60igq24.gz
 /app/obj/Debug/net10.0/compressed/conv0cg0pa-{0}-lugek5hnai-lugek5hnai.gz
 /app/obj/Debug/net10.0/compressed/acm82m7780-{0}-61n19gt1b8-61n19gt1b8.gz
 /app/obj/Debug/net10.0/compressed/tomr9z7ae4-{0}-1qnc6z9y5o-1qnc6z9y5o.gz
@@ -350,7 +348,6 @@
 /app/obj/Debug/net10.0/compressed/beegroqgkb-{0}-h1s4sie4z3-h1s4sie4z3.gz
 /app/obj/Debug/net10.0/compressed/l1rc91oop6-{0}-63fj8s7r0e-63fj8s7r0e.gz
 /app/obj/Debug/net10.0/compressed/5pci06hgg8-{0}-0j3bgjxly4-0j3bgjxly4.gz
-/app/obj/Debug/net10.0/compressed/4ziuczaveh-{0}-47otxtyo56-47otxtyo56.gz
 /app/obj/Debug/net10.0/compressed/4c0v0nzrlq-{0}-4v8eqarkd7-4v8eqarkd7.gz
 /app/obj/Debug/net10.0/compressed/x7dwfm6tg1-{0}-l3n5xuwxn8-l3n5xuwxn8.gz
 /app/obj/Debug/net10.0/compressed/cst37mmocb-{0}-ilo7uva0vt-ilo7uva0vt.gz
@@ -378,3 +375,6 @@
 /app/obj/Debug/net10.0/Biblioteca.pdb
 /app/obj/Debug/net10.0/Biblioteca.genruntimeconfig.cache
 /app/obj/Debug/net10.0/ref/Biblioteca.dll
+/app/obj/Debug/net10.0/compressed/x707g6crvw-{0}-l2wxy1oeed-l2wxy1oeed.gz
+/app/obj/Debug/net10.0/compressed/m9nrbdxmup-{0}-vvt3u1qjfh-vvt3u1qjfh.gz
+/app/obj/Debug/net10.0/compressed/4ziuczaveh-{0}-3u5o2exw91-3u5o2exw91.gz
