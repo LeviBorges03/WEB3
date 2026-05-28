@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button id="btnFavoritos" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,42 @@
         </div>
     </main>
 </div>
+
+<script>
+    const mockLivroTitulo = "O Mistério do Código Eterno"; // Usamos o título fixo para o mockup
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkFavoritoStatus();
+    });
+
+    function checkFavoritoStatus() {
+        const btnFavoritos = document.getElementById('btnFavoritos');
+        const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+        if (favoritos.includes(mockLivroTitulo)) {
+            btnFavoritos.innerText = "Remover dos Favoritos";
+        } else {
+            btnFavoritos.innerText = "Adicionar aos Favoritos";
+        }
+    }
+
+    function toggleFavorito() {
+        const btnFavoritos = document.getElementById('btnFavoritos');
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+        if (favoritos.includes(mockLivroTitulo)) {
+            // Remover
+            favoritos = favoritos.filter(f => f !== mockLivroTitulo);
+            btnFavoritos.innerText = "Adicionar aos Favoritos";
+        } else {
+            // Adicionar
+            favoritos.push(mockLivroTitulo);
+            btnFavoritos.innerText = "Remover dos Favoritos";
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+    }
+</script>
 
 </body>
 </html>
