@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Pesquisar por título ou autor..." oninput="filtrarLivros()" aria-label="Pesquisar livros">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -114,6 +117,40 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // Função de filtro de pesquisa da barra
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            // Quando digita algo, força a expansão para mostrar os resultados, se já não tiver expandido
+            const grid = document.getElementById('livrosGrid');
+            const btn = document.getElementById('expandBtn');
+            const btnIcon = document.getElementById('expandBtnIcon');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const btnText = document.getElementById('expandBtnText');
+
+            if (filter !== "" && !grid.classList.contains('expandido')) {
+                grid.classList.add('expandido');
+                btnIcon.classList.add('rodado');
+                navBtns.forEach(navBtn => navBtn.classList.add('escondido'));
+                btn.setAttribute('aria-expanded', 'true');
+                btn.setAttribute('aria-label', 'Recolher catálogo');
+                btnText.innerText = "Recolher catálogo";
+            }
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('.livro-info h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(filter) || autor.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
