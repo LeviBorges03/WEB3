@@ -25,6 +25,31 @@
     border-bottom: 3px solid var(--accent);
     display: inline-block;
     padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* --- ESTILO DA BARRA DE PESQUISA --- */
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 30px; /* Pill-shaped */
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-bar:focus {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
 }
 
 /* --- ESTILO DO CARROSSEL --- */
@@ -217,6 +242,18 @@
     color: var(--white);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
+}
+
+.expand-btn.favoritado {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+.expand-btn.favoritado:hover {
+    background: #e74c3c;
+    border-color: #c0392b;
+    box-shadow: 0 6px 16px rgba(231, 76, 60, 0.3);
 }
 
 .expand-icon {

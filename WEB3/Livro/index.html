@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button id="btnFavorito" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,41 @@
     </main>
 </div>
 
+<script>
+    function toggleFavorito() {
+        const btn = document.getElementById('btnFavorito');
+        const titulo = document.querySelector('.livro-header-info h1').innerText;
+        if (!titulo) return;
+
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+        if (favoritos.includes(titulo)) {
+            // Remover
+            favoritos = favoritos.filter(f => f !== titulo);
+            btn.classList.remove('favoritado');
+            btn.innerText = "Adicionar aos Favoritos";
+        } else {
+            // Adicionar
+            favoritos.push(titulo);
+            btn.classList.add('favoritado');
+            btn.innerText = "Remover dos Favoritos";
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+    }
+
+    // Checar estado inicial
+    window.addEventListener('load', () => {
+        const btn = document.getElementById('btnFavorito');
+        const titulo = document.querySelector('.livro-header-info h1').innerText;
+        if (!titulo) return;
+
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        if (favoritos.includes(titulo)) {
+            btn.classList.add('favoritado');
+            btn.innerText = "Remover dos Favoritos";
+        }
+    });
+</script>
 </body>
 </html>

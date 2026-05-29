@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button id="btnFavorito" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -219,6 +219,48 @@
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
             }
+        });
+
+        // Função do Sistema de Favoritos
+        function toggleFavorito() {
+            const btn = document.getElementById('btnFavorito');
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (!titulo || titulo === "Título Carregando...") return;
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+            if (favoritos.includes(titulo)) {
+                // Remover
+                favoritos = favoritos.filter(f => f !== titulo);
+                btn.classList.remove('favoritado');
+                btn.innerText = "Adicionar aos Favoritos";
+            } else {
+                // Adicionar
+                favoritos.push(titulo);
+                btn.classList.add('favoritado');
+                btn.innerText = "Remover dos Favoritos";
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
+
+        // Checar estado inicial
+        function verificarFavoritoInicial() {
+            const btn = document.getElementById('btnFavorito');
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (!titulo) return;
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            if (favoritos.includes(titulo)) {
+                btn.classList.add('favoritado');
+                btn.innerText = "Remover dos Favoritos";
+            }
+        }
+
+        // Modificando a checagem no load para chamar a verificação
+        const originalDOMContent = document.onreadystatechange;
+        window.addEventListener('load', () => {
+            setTimeout(verificarFavoritoInicial, 100); // pequeno delay pra garantir que o titulo carregou
         });
 
         // Função local para o usuário ir para o Autor estando na página do Livro
