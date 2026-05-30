@@ -25,6 +25,10 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container" style="margin-bottom: 20px; text-align: center;">
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título, autor ou gênero..." style="width: 80%; max-width: 600px; padding: 12px 20px; border-radius: 30px; border: 2px solid var(--accent); font-size: 1rem; outline: none; box-shadow: var(--shadow); transition: all 0.3s;" />
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -136,6 +140,26 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Função para filtrar livros na pesquisa
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cards = grid.getElementsByClassName('livro-card');
+
+            for (let i = 0; i < cards.length; i++) {
+                const titulo = cards[i].querySelector('h4').innerText.toLowerCase();
+                const autor = cards[i].querySelector('.autor-link-hover').innerText.toLowerCase();
+                const genero = cards[i].querySelector('.genero-tag').innerText.toLowerCase();
+
+                if (titulo.indexOf(filter) > -1 || autor.indexOf(filter) > -1 || genero.indexOf(filter) > -1) {
+                    cards[i].style.display = 'flex';
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
         }
     </script>
 }

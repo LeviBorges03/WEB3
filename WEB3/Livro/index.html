@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,45 @@
         </div>
     </main>
 </div>
+
+<script>
+    // Mock behavior for the static prototype
+    const mockLivro = { titulo: "O Mistério do Código Eterno", autor: "Clarice Inspira" };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializa o estado do botão para o protótipo
+        atualizarBotaoFavorito(mockLivro.titulo);
+    });
+
+    function obterFavoritos() {
+        const favs = localStorage.getItem('bibliotecaFavoritos');
+        return favs ? JSON.parse(favs) : [];
+    }
+
+    function atualizarBotaoFavorito(titulo) {
+        const favs = obterFavoritos();
+        const btn = document.getElementById('btnFavorito');
+        if (favs.includes(titulo)) {
+            btn.innerText = "Remover dos Favoritos";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+        }
+    }
+
+    function toggleFavorito() {
+        const titulo = mockLivro.titulo;
+        let favs = obterFavoritos();
+
+        if (favs.includes(titulo)) {
+            favs = favs.filter(f => f !== titulo);
+        } else {
+            favs.push(titulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        atualizarBotaoFavorito(titulo);
+    }
+</script>
 
 </body>
 </html>
