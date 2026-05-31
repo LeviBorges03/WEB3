@@ -23,6 +23,10 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="max-width: 600px; margin: 20px auto 0; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título ou autor..." class="form-control" oninput="filtrarLivros()" style="flex: 1; min-width: 200px; border-radius: 30px; padding: 10px 20px; box-shadow: var(--shadow); border: 2px solid var(--accent);" />
+            <button id="btnFiltrarFavoritos" onclick="filtrarFavoritos()" class="expand-btn" style="margin: 0; padding: 10px 20px; font-size: 0.9rem;">Meus Favoritos</button>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -90,6 +94,68 @@
             const grid = document.getElementById('livrosGrid');
             const scrollAmount = 300;
             grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        let exibindoFavoritos = false;
+
+        // Função para filtrar e mostrar apenas favoritos
+        function filtrarFavoritos() {
+            exibindoFavoritos = !exibindoFavoritos;
+            const btn = document.getElementById('btnFiltrarFavoritos');
+            const searchInput = document.getElementById('searchInput');
+
+            if (exibindoFavoritos) {
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'white';
+                searchInput.value = ''; // Limpa a busca ao ativar favoritos
+            } else {
+                btn.style.backgroundColor = 'var(--white)';
+                btn.style.color = 'var(--primary)';
+            }
+
+            aplicarFiltros();
+        }
+
+        // Modifica a função filtrarLivros para chamar aplicarFiltros
+        function filtrarLivros() {
+            aplicarFiltros();
+        }
+
+        // Centraliza a lógica de filtros (pesquisa + favoritos)
+        function aplicarFiltros() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+            let favoritos = [];
+            if (favoritosStr) {
+                try {
+                    favoritos = JSON.parse(favoritosStr);
+                } catch (e) {
+                    favoritos = [];
+                }
+            }
+
+            // Expandir automaticamente a grade para melhor visualização ao pesquisar ou filtrar favoritos
+            const grid = document.getElementById('livrosGrid');
+            if ((termo.length > 0 || exibindoFavoritos) && !grid.classList.contains('expandido')) {
+                toggleExpand();
+            }
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('.livro-info h4').innerText;
+                const tituloLower = titulo.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                let matchBusca = tituloLower.includes(termo) || autor.includes(termo);
+                let matchFavorito = !exibindoFavoritos || favoritos.includes(titulo);
+
+                if (matchBusca && matchFavorito) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // Função para expandir o grid e mostrar todos os livros
