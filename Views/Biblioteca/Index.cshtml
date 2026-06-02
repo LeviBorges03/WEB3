@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 60%; max-width: 400px; border: 2px solid var(--accent); border-radius: 20px; outline: none; font-size: 1rem;" oninput="filtrarLivros()">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -47,6 +50,7 @@
                                 <p class="autor-link-hover">@item.Autor</p>
                             </div>
                         </div>
+                        <span class="fav-icon" data-titulo="@item.Titulo" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; display: none;">⭐</span>
                     </a>
                 </div>
             }
@@ -85,6 +89,20 @@
 
 @section Scripts {
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            if (favs) {
+                const favoritos = JSON.parse(favs);
+                const favIcons = document.querySelectorAll('.fav-icon');
+                favIcons.forEach(icon => {
+                    const titulo = icon.getAttribute('data-titulo');
+                    if (favoritos.includes(titulo)) {
+                        icon.style.display = 'block';
+                    }
+                });
+            }
+        });
+
         // Função simples para rolar os livros lateralmente
         function scrollGrid(direction) {
             const grid = document.getElementById('livrosGrid');
@@ -114,6 +132,23 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // Função de filtro para a barra de pesquisa
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livros-grid .livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('.livro-info h4').innerText.toLowerCase();
+                const autor = card.querySelector('.livro-info p').innerText.toLowerCase();
+
+                if (titulo.includes(query) || autor.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
