@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,59 @@
     </main>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tenta pegar o livro do LocalStorage para manter compatibilidade, mas provê fallback
+        const data = localStorage.getItem('livroAtual');
+        const livro = data ? JSON.parse(data) : { titulo: "O Mistério do Código Eterno", autor: "Clarice Inspira" };
+
+        // Lida com o sistema de favoritos (Estrela)
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const isFavorito = favoritos.includes(livro.titulo);
+        const tituloDisplay = isFavorito ? `${livro.titulo} <span id="starIcon" style="color: gold;">⭐</span>` : `${livro.titulo} <span id="starIcon" style="color: gold; display: none;">⭐</span>`;
+
+        // Injeta os dados no DOM
+        const tituloElem = document.querySelector('.livro-header-info h1');
+        if (tituloElem) {
+            tituloElem.innerHTML = tituloDisplay;
+        }
+
+        // Atualiza botão
+        const btn = document.getElementById('btnFavorito');
+        if (isFavorito && btn) {
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.borderColor = "#e74c3c";
+            btn.style.color = "#e74c3c";
+        }
+    });
+
+    function toggleFavorito() {
+        const data = localStorage.getItem('livroAtual');
+        const livro = data ? JSON.parse(data) : { titulo: "O Mistério do Código Eterno" };
+        const titulo = livro.titulo;
+
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const btn = document.getElementById('btnFavorito');
+        const star = document.getElementById('starIcon');
+
+        if (favoritos.includes(titulo)) {
+            // Remove
+            favoritos = favoritos.filter(f => f !== titulo);
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.borderColor = "var(--accent)";
+            btn.style.color = "var(--primary)";
+            if (star) star.style.display = 'none';
+        } else {
+            // Adiciona
+            favoritos.push(titulo);
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.borderColor = "#e74c3c";
+            btn.style.color = "#e74c3c";
+            if (star) star.style.display = 'inline';
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+    }
+</script>
 </body>
 </html>
