@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button id="btnFavoritar" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -214,6 +214,8 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                verificarFavorito(livro.titulo);
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
@@ -229,6 +231,36 @@
                 localStorage.setItem('autorAtual', autorNome);
                 window.location.href = '@Url.Action("Autor", "Biblioteca")';
             }
+        }
+
+        function getFavoritos() {
+            return JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+        }
+
+        function verificarFavorito(titulo) {
+            const favoritos = getFavoritos();
+            const btn = document.getElementById('btnFavoritar');
+            if (favoritos.includes(titulo)) {
+                btn.innerText = "⭐ Remover dos Favoritos";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+            }
+        }
+
+        function toggleFavorito() {
+            const livroDataStr = localStorage.getItem('livroAtual');
+            if (!livroDataStr) return;
+
+            const livro = JSON.parse(livroDataStr);
+            let favoritos = getFavoritos();
+
+            if (favoritos.includes(livro.titulo)) {
+                favoritos = favoritos.filter(f => f !== livro.titulo);
+            } else {
+                favoritos.push(livro.titulo);
+            }
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            verificarFavorito(livro.titulo);
         }
     </script>
 }
