@@ -23,6 +23,12 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+
+        <!-- Barra de pesquisa -->
+        <div class="search-container" style="margin-top: 20px; display: flex; justify-content: center;">
+            <input type="text" id="searchInput" placeholder="Pesquisar livros por título ou autor..." oninput="filtrarLivros()"
+                   style="width: 100%; max-width: 500px; padding: 12px 20px; border-radius: 30px; border: 2px solid var(--accent); outline: none; font-size: 1rem; box-shadow: var(--shadow);" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -37,6 +43,7 @@
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
+                            <span class="star-favorito" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; z-index: 2; display: none;">⭐</span>
                             <span class="genero-tag">@item.Genero</span>
                         </div>
                         <div class="livro-info">
@@ -136,6 +143,43 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const tituloElement = card.querySelector('.livro-info h4');
+                if (tituloElement) {
+                    const titulo = tituloElement.innerText.trim();
+                    if (favoritos.includes(titulo)) {
+                        const star = card.querySelector('.star-favorito');
+                        if (star) star.style.display = 'block';
+                    }
+                }
+            });
+        });
+
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const tituloElement = card.querySelector('.livro-info h4');
+                const autorElement = card.querySelector('.autor-link-hover');
+
+                if (tituloElement && autorElement) {
+                    const titulo = tituloElement.innerText.toLowerCase();
+                    const autor = autorElement.innerText.toLowerCase();
+
+                    if (titulo.includes(query) || autor.includes(query)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
         }
     </script>
 }
