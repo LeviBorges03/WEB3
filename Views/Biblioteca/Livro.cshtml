@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -196,6 +196,39 @@
 
 @section Scripts {
     <script>
+
+        // Logica para Favoritos
+        function atualizarBotaoFavorito(titulo) {
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const btn = document.getElementById('btnFavorito');
+            if (favoritos.includes(titulo)) {
+                btn.innerText = "Remover dos Favoritos";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+            }
+        }
+
+        function toggleFavorito() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+
+            const livro = JSON.parse(data);
+            const titulo = livro.titulo;
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+            if (favoritos.includes(titulo)) {
+                // Remover
+                favoritos = favoritos.filter(f => f !== titulo);
+            } else {
+                // Adicionar
+                favoritos.push(titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            atualizarBotaoFavorito(titulo);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Tenta pegar o livro do LocalStorage
             const data = localStorage.getItem('livroAtual');
@@ -211,6 +244,7 @@
                 document.getElementById('livroGenero').innerText = livro.genero;
                 document.getElementById('livroAno').innerText = livro.ano || 'Desconhecido';
                 document.getElementById('livroPaginas').innerText = livro.paginas || 'N/A';
+                atualizarBotaoFavorito(livro.titulo);
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
