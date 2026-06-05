@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,38 @@
     </main>
 </div>
 
+
+<script>
+    function atualizarBotaoFavorito(titulo) {
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+        const btn = document.getElementById('btnFavorito');
+        if (favoritos.includes(titulo)) {
+            btn.innerText = "Remover dos Favoritos";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+        }
+    }
+
+    function toggleFavorito() {
+        const titulo = "O Mistério do Código Eterno"; // Static title for prototype
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+        if (favoritos.includes(titulo)) {
+            // Remover
+            favoritos = favoritos.filter(f => f !== titulo);
+        } else {
+            // Adicionar
+            favoritos.push(titulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        atualizarBotaoFavorito(titulo);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarBotaoFavorito("O Mistério do Código Eterno");
+    });
+</script>
 </body>
+
 </html>
