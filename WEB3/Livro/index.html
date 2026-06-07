@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,48 @@
         </div>
     </main>
 </div>
+
+<script>
+    let livroAtualTitulo = "";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tenta buscar o título dinamicamente a partir do elemento h1, já que este é um protótipo estático
+        const h1Element = document.querySelector('.livro-header-info h1');
+        if (h1Element) {
+            livroAtualTitulo = h1Element.innerText;
+        }
+        atualizarBotaoFavorito();
+    });
+
+    function atualizarBotaoFavorito() {
+        const btn = document.getElementById('btnFavorito');
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+        if (favoritos.includes(livroAtualTitulo)) {
+            btn.innerText = "⭐ Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--bg-light)";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = "var(--white)";
+        }
+    }
+
+    function toggleFavorito() {
+        if (!livroAtualTitulo) return;
+
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const index = favoritos.indexOf(livroAtualTitulo);
+
+        if (index > -1) {
+            favoritos.splice(index, 1);
+        } else {
+            favoritos.push(livroAtualTitulo);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        atualizarBotaoFavorito();
+    }
+</script>
 
 </body>
 </html>
