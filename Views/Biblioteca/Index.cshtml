@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center;">
+            <input type="text" id="inputPesquisa" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 300px; border-radius: 20px; border: 1px solid var(--accent); box-shadow: var(--shadow); font-size: 1rem; outline: none;" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -92,6 +95,24 @@
             grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         }
 
+        // Função para filtrar os livros
+        function filtrarLivros() {
+            const input = document.getElementById('inputPesquisa');
+            const filtro = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(filtro) || autor.includes(filtro)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         // Função para expandir o grid e mostrar todos os livros
         function toggleExpand() {
             const grid = document.getElementById('livrosGrid');
@@ -115,6 +136,21 @@
                 btnText.innerText = "Ver todo o catálogo";
             }
         }
+
+        // Função para mostrar marcadores de favoritos
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const tituloElement = card.querySelector('h4');
+                const titulo = tituloElement.innerText;
+
+                if (favoritos.includes(titulo)) {
+                    tituloElement.innerText = "⭐ " + titulo;
+                }
+            });
+        });
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
         function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
