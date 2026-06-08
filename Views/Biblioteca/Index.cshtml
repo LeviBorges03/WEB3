@@ -25,6 +25,10 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container" style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..." style="width: 80%; max-width: 500px; padding: 10px; border-radius: 20px; border: 1px solid var(--accent); outline: none; font-size: 1rem;" oninput="filtrarLivros()">
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -38,6 +42,7 @@
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-star" data-titulo="@item.Titulo" style="display: none; position: absolute; top: 10px; right: 10px; font-size: 1.5rem; text-shadow: 0 0 5px rgba(0,0,0,0.5);">⭐</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -136,6 +141,41 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarFavoritos();
+        });
+
+        function mostrarFavoritos() {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const stars = document.querySelectorAll('.favorito-star');
+
+            stars.forEach(star => {
+                const titulo = star.getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    star.style.display = 'block';
+                } else {
+                    star.style.display = 'none';
+                }
+            });
+        }
+
+        // Função para filtrar os livros
+        function filtrarLivros() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const livros = document.querySelectorAll('.livro-card');
+
+            livros.forEach(livro => {
+                const textoLivro = livro.innerText.toLowerCase();
+
+                // Mostrar os itens flex para a lógica do grid continuar funcionando
+                if (textoLivro.includes(searchQuery)) {
+                    livro.style.display = 'flex';
+                } else {
+                    livro.style.display = 'none';
+                }
+            });
         }
     </script>
 }
