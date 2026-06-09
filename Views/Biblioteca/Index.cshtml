@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 20px; text-align: center;">
+            <input type="text" id="pesquisaInput" placeholder="Pesquisar por título ou autor..." class="form-control" style="max-width: 400px; margin: 0 auto; display: inline-block; border-radius: 20px; padding: 10px 20px;" oninput="filtrarLivros()" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -38,6 +41,7 @@
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-icon" data-titulo="@item.Titulo" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; cursor: pointer; color: #ccc; transition: color 0.3s; z-index: 10;">★</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -115,6 +119,57 @@
                 btnText.innerText = "Ver todo o catálogo";
             }
         }
+
+        // --- FUNÇÃO DE PESQUISA --- //
+        function filtrarLivros() {
+            const input = document.getElementById('pesquisaInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('.livro-info h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(input) || autor.includes(input)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // --- FUNÇÃO DE FAVORITOS --- //
+        function toggleFavorito(event, titulo) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(f => f !== titulo);
+            } else {
+                favoritos.push(titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            atualizarIconesFavoritos();
+        }
+
+        function atualizarIconesFavoritos() {
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const icones = document.querySelectorAll('.favorito-icon');
+
+            icones.forEach(icone => {
+                const titulo = icone.getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    icone.style.color = '#f1c40f'; // Dourado
+                } else {
+                    icone.style.color = '#ccc'; // Cinza
+                }
+            });
+        }
+
+        // Atualizar ícones assim que a página carregar
+        document.addEventListener('DOMContentLoaded', atualizarIconesFavoritos);
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
         function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
