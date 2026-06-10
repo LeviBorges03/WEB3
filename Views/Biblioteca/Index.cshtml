@@ -16,6 +16,19 @@
             color: var(--primary);
             text-decoration: underline;
         }
+        .search-bar {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-bar:focus {
+            border-color: var(--accent);
+        }
     </style>
 }
 
@@ -23,6 +36,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px;">
+            <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." class="search-bar" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -85,6 +101,39 @@
 
 @section Scripts {
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+            if (favoritosStr) {
+                const favoritos = JSON.parse(favoritosStr);
+                const cards = document.querySelectorAll('.livro-card');
+
+                cards.forEach(card => {
+                    const tituloEl = card.querySelector('h4');
+                    const titulo = tituloEl.innerText;
+                    if (favoritos.includes(titulo)) {
+                        tituloEl.innerText = `⭐ ${titulo}`;
+                    }
+                });
+            }
+        });
+
+        // Função para filtrar livros (título ou autor)
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4').innerText.toLowerCase();
+                const autor = card.querySelector('.autor-link-hover').innerText.toLowerCase();
+
+                if (titulo.includes(input) || autor.includes(input)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         // Função simples para rolar os livros lateralmente
         function scrollGrid(direction) {
             const grid = document.getElementById('livrosGrid');
