@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritar" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,15 @@
     </main>
 </div>
 
+<script>
+    function toggleFavorito() {
+        const btn = document.getElementById('btnFavoritar');
+        if (btn.innerText === "Adicionar aos Favoritos") {
+            btn.innerText = "Remover dos Favoritos";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+        }
+    }
+</script>
 </body>
 </html>
