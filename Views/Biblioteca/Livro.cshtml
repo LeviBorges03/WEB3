@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button id="favBtn" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -230,5 +230,55 @@
                 window.location.href = '@Url.Action("Autor", "Biblioteca")';
             }
         }
+
+        // Lógica de Favoritos
+        function updateFavBtnState() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+            const livro = JSON.parse(data);
+            const favsData = localStorage.getItem('bibliotecaFavoritos');
+            let favs = [];
+            if (favsData) {
+                try {
+                    favs = JSON.parse(favsData);
+                } catch (e) { }
+            }
+
+            const btn = document.getElementById('favBtn');
+            if (favs.includes(livro.titulo)) {
+                btn.innerText = "Remover dos Favoritos ⭐";
+            } else {
+                btn.innerText = "Adicionar aos Favoritos";
+            }
+        }
+
+        function toggleFavorito() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+            const livro = JSON.parse(data);
+
+            const favsData = localStorage.getItem('bibliotecaFavoritos');
+            let favs = [];
+            if (favsData) {
+                try {
+                    favs = JSON.parse(favsData);
+                } catch (e) { }
+            }
+
+            const index = favs.indexOf(livro.titulo);
+            if (index > -1) {
+                favs.splice(index, 1);
+            } else {
+                favs.push(livro.titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+            updateFavBtnState();
+        }
+
+        // Chama ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateFavBtnState();
+        });
     </script>
 }

@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container" style="margin-top: 20px; text-align: center;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título, autor ou gênero..." style="padding: 10px; width: 60%; max-width: 500px; border-radius: 20px; border: 1px solid var(--accent); outline: none; font-size: 1rem;" oninput="filtrarLivros()">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -38,6 +41,7 @@
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-icon" id="fav-icon-@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; display: none;">⭐</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -137,5 +141,38 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const favsData = localStorage.getItem('bibliotecaFavoritos');
+            if (favsData) {
+                try {
+                    const favs = JSON.parse(favsData);
+                    const icons = document.querySelectorAll('.favorito-icon');
+                    icons.forEach(icon => {
+                        // The id is structured as "fav-icon-{Title}"
+                        const title = icon.id.substring(9);
+                        if (favs.includes(title)) {
+                            icon.style.display = 'inline-block';
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error parsing favorites data.", e);
+                }
+            }
+        });
     </script>
 }

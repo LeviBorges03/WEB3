@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button id="favBtn" class="expand-btn" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,49 @@
     </main>
 </div>
 
+<script>
+    const staticTitle = "O Mistério do Código Eterno";
+
+    function updateFavBtnState() {
+        const favsData = localStorage.getItem('bibliotecaFavoritos');
+        let favs = [];
+        if (favsData) {
+            try {
+                favs = JSON.parse(favsData);
+            } catch (e) { }
+        }
+
+        const btn = document.getElementById('favBtn');
+        if (favs.includes(staticTitle)) {
+            btn.innerText = "Remover dos Favoritos ⭐";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+        }
+    }
+
+    function toggleFavorito() {
+        const favsData = localStorage.getItem('bibliotecaFavoritos');
+        let favs = [];
+        if (favsData) {
+            try {
+                favs = JSON.parse(favsData);
+            } catch (e) { }
+        }
+
+        const index = favs.indexOf(staticTitle);
+        if (index > -1) {
+            favs.splice(index, 1);
+        } else {
+            favs.push(staticTitle);
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        updateFavBtnState();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateFavBtnState();
+    });
+</script>
 </body>
 </html>
