@@ -25,6 +25,8 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título..." class="form-control" style="margin-bottom: 20px;" />
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -40,7 +42,7 @@
                             <span class="genero-tag">@item.Genero</span>
                         </div>
                         <div class="livro-info">
-                            <h4>@item.Titulo</h4>
+                            <h4><span class="favorito-icon" data-titulo="@item.Titulo"></span>@item.Titulo</h4>
 
                             @* Elemento independente para abrir o Autor sem acionar o clique do livro usando event.stopPropagation() *@
                             <div onclick="abrirAutor(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))')">
@@ -136,6 +138,41 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // Atualizar ícones de favoritos na vitrine
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+            let favoritos = [];
+            if (favoritosStr) {
+                favoritos = JSON.parse(favoritosStr);
+            }
+
+            const icons = document.querySelectorAll('.favorito-icon');
+            icons.forEach(icon => {
+                const titulo = icon.getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    icon.innerText = '⭐ ';
+                } else {
+                    icon.innerText = '';
+                }
+            });
+        });
+
+        // Função para filtrar livros pelo título
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('.livro-info h4').innerText.toLowerCase();
+                if (titulo.indexOf(filter) > -1) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
