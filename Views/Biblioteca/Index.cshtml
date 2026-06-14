@@ -16,6 +16,28 @@
             color: var(--primary);
             text-decoration: underline;
         }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 2px solid var(--accent);
+            border-radius: 30px;
+            outline: none;
+            transition: box-shadow 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        #searchInput:focus {
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
     </style>
 }
 
@@ -24,6 +46,10 @@
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
     </section>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título, autor ou gênero...">
+    </div>
 
     <div class="carousel-container">
         @* Botão Esquerdo *@
@@ -116,6 +142,23 @@
             }
         }
 
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.querySelector('h4') ? card.querySelector('h4').innerText.toLowerCase() : "";
+                const autor = card.querySelector('.autor-link-hover') ? card.querySelector('.autor-link-hover').innerText.toLowerCase() : "";
+                const genero = card.querySelector('.genero-tag') ? card.querySelector('.genero-tag').innerText.toLowerCase() : "";
+
+                if (titulo.includes(input) || autor.includes(input) || genero.includes(input)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
         function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
             // Salvar no localStorage os dados que o Livro.cshtml precisa montar
@@ -137,5 +180,31 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let favoritos = [];
+            const data = localStorage.getItem('bibliotecaFavoritos');
+            if (data) {
+                try {
+                    favoritos = JSON.parse(data);
+                } catch (e) {
+                    favoritos = [];
+                }
+            }
+
+            if (favoritos.length > 0) {
+                const cards = document.querySelectorAll('.livro-card');
+                cards.forEach(card => {
+                    const h4 = card.querySelector('h4');
+                    if (h4) {
+                        const tituloLimpo = h4.innerText.trim();
+                        if (favoritos.includes(tituloLimpo)) {
+                            // Adicionando um nó de texto usando appendChild para mitigar XSS conforme diretiva da memória
+                            h4.appendChild(document.createTextNode(" ⭐"));
+                        }
+                    }
+                });
+            }
+        });
     </script>
 }
