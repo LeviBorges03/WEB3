@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; display: flex; justify-content: center;">
+            <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 60%; max-width: 400px; border: 2px solid var(--accent); border-radius: 20px; outline: none; font-size: 1rem;">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -38,6 +41,7 @@
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-star" data-titulo="@item.Titulo" style="display: none; position: absolute; top: 10px; right: 10px; font-size: 1.5rem; filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)); z-index: 3;">⭐</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -137,5 +141,55 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // Função para filtrar livros na pesquisa
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const tituloElement = card.querySelector('h4');
+                const autorElement = card.querySelector('.autor-link-hover');
+                const titulo = tituloElement ? tituloElement.innerText.toLowerCase() : '';
+                const autor = autorElement ? autorElement.innerText.toLowerCase() : '';
+
+                if (titulo.includes(query) || autor.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Função para ler o localStorage e mostrar estrelas nos favoritos
+        function renderizarFavoritos() {
+            const favsStr = localStorage.getItem('bibliotecaFavoritos');
+            const favoritos = favsStr ? JSON.parse(favsStr) : [];
+
+            const stars = document.querySelectorAll('.favorito-star');
+            stars.forEach(star => {
+                const titulo = star.getAttribute('data-titulo');
+                // IMPORTANTE: Como as strings no HTML podem ter escapes HTML via Razor, é melhor tratar.
+                // Mas aqui titulo está vindo do atributo, decodificado pelo navegador.
+
+                // Usando uma heurística simples, comparamos diretamente
+                // Caso haja erro de encoding (como aspas), podemos lidar com includes ou decode.
+
+                // Pega os favoritos para ver se inclui
+                // Para ser robusto a escapes de aspas
+                let ehFavorito = favoritos.some(f => f === titulo || f.replace(/&quot;/g, '"').replace(/&#x27;/g, "'") === titulo);
+
+                if (ehFavorito) {
+                    star.style.display = 'block';
+                } else {
+                    star.style.display = 'none';
+                }
+            });
+        }
+
+        // Chamamos a função ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarFavoritos();
+        });
     </script>
 }
