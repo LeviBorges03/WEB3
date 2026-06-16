@@ -72,7 +72,7 @@
                     <span class="genero-tag">Ficção</span>
                 </div>
                 <div class="livro-info">
-                    <h4>O Mistério do Código Eterno</h4>
+                    <h4 class="livro-titulo" data-titulo="O Mistério do Código Eterno">O Mistério do Código Eterno</h4>
                     <p>Clarice Inspira</p>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     <span class="genero-tag">Tecnologia</span>
                 </div>
                 <div class="livro-info">
-                    <h4>Algoritmos da Alma</h4>
+                    <h4 class="livro-titulo" data-titulo="Algoritmos da Alma">Algoritmos da Alma</h4>
                     <p>Clarice Inspira</p>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                     <span class="genero-tag">Ensaio</span>
                 </div>
                 <div class="livro-info">
-                    <h4>O Futuro do Papel</h4>
+                    <h4 class="livro-titulo" data-titulo="O Futuro do Papel">O Futuro do Papel</h4>
                     <p>Clarice Inspira</p>
                 </div>
             </div>
@@ -101,5 +101,18 @@
 </main>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+        const titulos = document.querySelectorAll('.livro-titulo');
+
+        titulos.forEach(t => {
+            const tituloLivro = t.getAttribute('data-titulo');
+            if (favoritos.includes(tituloLivro)) {
+                t.innerText = '⭐ ' + tituloLivro;
+            }
+        });
+    });
+</script>
 </body>
 </html>
