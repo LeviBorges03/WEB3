@@ -23,6 +23,15 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px; margin-bottom: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <input type="text" id="searchInput" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 80%; max-width: 500px; border: 2px solid var(--accent); border-radius: 20px; outline: none; font-size: 1rem;" oninput="filtrarLivros()">
+            <div>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold; color: var(--primary);">
+                    <input type="checkbox" id="chkFavoritos" onchange="filtrarLivros()">
+                    <span>⭐ Mostrar Apenas Favoritos</span>
+                </label>
+            </div>
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -38,6 +47,7 @@
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-indicator" data-titulo="@item.Titulo" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; display: none;">⭐</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -137,5 +147,57 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // Função de pesquisa e filtro de favoritos
+        function filtrarLivros() {
+            const searchInput = document.getElementById('searchInput');
+            const chkFavoritos = document.getElementById('chkFavoritos');
+
+            const term = searchInput ? searchInput.value.toLowerCase() : '';
+            const apenasFavoritos = chkFavoritos ? chkFavoritos.checked : false;
+
+            const favsStr = localStorage.getItem('bibliotecaFavoritos');
+            const favoritos = favsStr ? JSON.parse(favsStr) : [];
+
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const tituloElem = card.querySelector('.livro-info h4');
+                const autorElem = card.querySelector('.livro-info p');
+
+                const titulo = tituloElem ? tituloElem.innerText.toLowerCase() : '';
+                const autor = autorElem ? autorElem.innerText.toLowerCase() : '';
+
+                const matchTerm = titulo.includes(term) || autor.includes(term);
+
+                // Para checar favoritos, usamos o texto original do titulo (case sensitive ou usando o innerText sem toLowerCase, mas o ideal é o texto do título do card)
+                const originalTitle = tituloElem ? tituloElem.innerText : '';
+                const isFavorito = favoritos.includes(originalTitle);
+
+                const matchFavorito = apenasFavoritos ? isFavorito : true;
+
+                if (matchTerm && matchFavorito) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Função para atualizar as estrelinhas ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const favsStr = localStorage.getItem('bibliotecaFavoritos');
+            const favoritos = favsStr ? JSON.parse(favsStr) : [];
+
+            const indicators = document.querySelectorAll('.favorito-indicator');
+            indicators.forEach(ind => {
+                if (favoritos.includes(ind.getAttribute('data-titulo'))) {
+                    ind.style.display = 'block';
+                }
+            });
+
+            // Aplica filtro inicial caso recarregue com checkbox marcado
+            filtrarLivros();
+        });
     </script>
 }
