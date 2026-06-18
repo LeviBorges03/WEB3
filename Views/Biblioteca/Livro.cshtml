@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -214,6 +214,23 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                // Verificar se é favorito
+                const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+                if (favoritosStr) {
+                    try {
+                        const favoritos = JSON.parse(favoritosStr);
+                        if (favoritos.includes(livro.titulo)) {
+                            const btn = document.getElementById('btnFavorito');
+                            btn.innerText = "Remover dos Favoritos";
+                            btn.style.backgroundColor = "var(--accent)";
+                            btn.style.color = "var(--white)";
+                        }
+                    } catch(e) {
+                        console.error('Erro ao ler favoritos', e);
+                    }
+                }
+
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
@@ -229,6 +246,39 @@
                 localStorage.setItem('autorAtual', autorNome);
                 window.location.href = '@Url.Action("Autor", "Biblioteca")';
             }
+        }
+
+        function toggleFavorito() {
+            const titulo = document.getElementById('livroTitulo').innerText;
+            if (titulo === "Título Carregando..." || titulo === "Nenhum Livro Selecionado") return;
+
+            let favoritos = [];
+            const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+
+            if (favoritosStr) {
+                try {
+                    favoritos = JSON.parse(favoritosStr);
+                } catch(e) {}
+            }
+
+            const btn = document.getElementById('btnFavorito');
+            const index = favoritos.indexOf(titulo);
+
+            if (index > -1) {
+                // Remover
+                favoritos.splice(index, 1);
+                btn.innerText = "Adicionar aos Favoritos";
+                btn.style.backgroundColor = ""; // Voltar ao padrão
+                btn.style.color = "";
+            } else {
+                // Adicionar
+                favoritos.push(titulo);
+                btn.innerText = "Remover dos Favoritos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "var(--white)";
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
         }
     </script>
 }

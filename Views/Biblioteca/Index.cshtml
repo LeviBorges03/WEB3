@@ -23,6 +23,7 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar livros ou autores..." class="search-input" style="width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" />
     </section>
 
     <div class="carousel-container">
@@ -40,7 +41,7 @@
                             <span class="genero-tag">@item.Genero</span>
                         </div>
                         <div class="livro-info">
-                            <h4>@item.Titulo</h4>
+                            <h4 data-titulo="@item.Titulo">@item.Titulo</h4>
 
                             @* Elemento independente para abrir o Autor sem acionar o clique do livro usando event.stopPropagation() *@
                             <div onclick="abrirAutor(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))')">
@@ -115,6 +116,40 @@
                 btnText.innerText = "Ver todo o catálogo";
             }
         }
+
+        // Função para filtrar livros (Pesquisa)
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Carregar favoritos ao iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+            if (favoritosStr) {
+                try {
+                    const favoritos = JSON.parse(favoritosStr);
+                    const titles = document.querySelectorAll('.livro-info h4');
+                    titles.forEach(titleElement => {
+                        const titulo = titleElement.getAttribute('data-titulo');
+                        if (titulo && favoritos.includes(titulo)) {
+                            titleElement.innerHTML = titleElement.innerText + ' <span class="favorito-star">⭐</span>';
+                        }
+                    });
+                } catch(e) {
+                    console.error('Erro ao parsear favoritos do localStorage', e);
+                }
+            }
+        });
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
         function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
