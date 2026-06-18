@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavorito" onclick="toggleFavorito()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,55 @@
     </main>
 </div>
 
+<script>
+    const livroTitulo = "O Mistério do Código Eterno"; // Simulação baseada no HTML
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+        if (favoritosStr) {
+            try {
+                const favoritos = JSON.parse(favoritosStr);
+                if (favoritos.includes(livroTitulo)) {
+                    const btn = document.getElementById('btnFavorito');
+                    btn.innerText = "Remover dos Favoritos";
+                    btn.style.backgroundColor = "var(--accent)";
+                    btn.style.color = "var(--white)";
+                }
+            } catch(e) {
+                console.error('Erro ao ler favoritos', e);
+            }
+        }
+    });
+
+    function toggleFavorito() {
+        let favoritos = [];
+        const favoritosStr = localStorage.getItem('bibliotecaFavoritos');
+
+        if (favoritosStr) {
+            try {
+                favoritos = JSON.parse(favoritosStr);
+            } catch(e) {}
+        }
+
+        const btn = document.getElementById('btnFavorito');
+        const index = favoritos.indexOf(livroTitulo);
+
+        if (index > -1) {
+            // Remover
+            favoritos.splice(index, 1);
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = ""; // Voltar ao padrão
+            btn.style.color = "";
+        } else {
+            // Adicionar
+            favoritos.push(livroTitulo);
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--accent)";
+            btn.style.color = "var(--white)";
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+    }
+</script>
 </body>
 </html>
