@@ -23,6 +23,7 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título, autor ou gênero..." class="form-control mb-3" style="max-width: 400px; margin: 0 auto; display: block; border-radius: 20px; padding: 10px 20px; border: 1px solid var(--accent); box-shadow: var(--shadow);" />
     </section>
 
     <div class="carousel-container">
@@ -33,7 +34,10 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" style="position: relative;">
+                    <!-- Favoritos icon (☆ / ⭐) -->
+                    <span class="favorite-icon" data-titulo="@Html.Raw(System.Web.HttpUtility.HtmlEncode(item.Titulo))" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" style="cursor: pointer; position: absolute; top: 10px; right: 10px; font-size: 1.5em; z-index: 10;">☆</span>
+
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
@@ -136,6 +140,71 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // --- SISTEMA DE FAVORITOS --- //
+        function obterFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function salvarFavoritos(favs) {
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        }
+
+        function toggleFavorito(event, titulo) {
+            event.preventDefault();
+            event.stopPropagation(); // Evita abrir o livro
+
+            let favoritos = obterFavoritos();
+            const index = favoritos.indexOf(titulo);
+
+            if (index > -1) {
+                favoritos.splice(index, 1); // Remove
+            } else {
+                favoritos.push(titulo); // Adiciona
+            }
+
+            salvarFavoritos(favoritos);
+            atualizarFavoritosUI();
+        }
+
+        function atualizarFavoritosUI() {
+            const favoritos = obterFavoritos();
+            const icones = document.querySelectorAll('.favorite-icon');
+
+            icones.forEach(icone => {
+                const titulo = icone.getAttribute('data-titulo');
+                // Decode HTML entities, since it was HtmlEncoded
+                const txt = document.createElement("textarea");
+                txt.innerHTML = titulo;
+                const tituloDecoded = txt.value;
+
+                if (favoritos.includes(tituloDecoded)) {
+                    icone.innerText = '⭐';
+                } else {
+                    icone.innerText = '☆';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarFavoritosUI();
+        });
+
+        // --- FUNÇÃO DE BUSCA --- //
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }

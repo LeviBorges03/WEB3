@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavoritar" onclick="toggleFavoritoLivroAtual()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -230,5 +230,60 @@
                 window.location.href = '@Url.Action("Autor", "Biblioteca")';
             }
         }
+
+        // --- SISTEMA DE FAVORITOS (Livro Atual) --- //
+        function obterFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function salvarFavoritos(favs) {
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        }
+
+        function atualizarBotaoFavoritoUI(titulo) {
+            const btn = document.getElementById('btnFavoritar');
+            if (!btn) return;
+
+            const favoritos = obterFavoritos();
+
+            if (favoritos.includes(titulo)) {
+                btn.innerText = 'Remover dos Favoritos';
+                btn.style.backgroundColor = 'var(--accent)';
+                btn.style.color = 'white';
+            } else {
+                btn.innerText = 'Adicionar aos Favoritos';
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--primary)';
+            }
+        }
+
+        function toggleFavoritoLivroAtual() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+
+            const livro = JSON.parse(data);
+            const titulo = livro.titulo;
+
+            let favoritos = obterFavoritos();
+            const index = favoritos.indexOf(titulo);
+
+            if (index > -1) {
+                favoritos.splice(index, 1); // Remove
+            } else {
+                favoritos.push(titulo); // Adiciona
+            }
+
+            salvarFavoritos(favoritos);
+            atualizarBotaoFavoritoUI(titulo);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = localStorage.getItem('livroAtual');
+            if (data) {
+                const livro = JSON.parse(data);
+                atualizarBotaoFavoritoUI(livro.titulo);
+            }
+        });
     </script>
 }
