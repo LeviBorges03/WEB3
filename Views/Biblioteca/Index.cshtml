@@ -16,6 +16,42 @@
             color: var(--primary);
             text-decoration: underline;
         }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: 2px solid var(--accent);
+            border-radius: 30px;
+            outline: none;
+            transition: box-shadow 0.3s;
+        }
+        .search-input:focus {
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+        .favorito-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            color: #ccc;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .favorito-btn:hover {
+            transform: scale(1.1);
+        }
+        .favorito-btn.ativo {
+            color: #f1c40f; /* Gold for favorite */
+        }
     </style>
 }
 
@@ -25,6 +61,10 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container">
+        <input type="text" id="searchBar" class="search-input" placeholder="Pesquisar por título, autor ou gênero..." oninput="filtrarLivros()">
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -33,11 +73,14 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo" data-autor="@item.Autor" data-genero="@item.Genero">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <button type="button" class="favorito-btn" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" data-titulo-btn="@item.Titulo" aria-label="Favoritar">
+                                ⭐
+                            </button>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -137,5 +180,59 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // --- FUNÇÕES DE PESQUISA E FAVORITOS --- //
+        function filtrarLivros() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo').toLowerCase();
+                const autor = card.getAttribute('data-autor').toLowerCase();
+                const genero = card.getAttribute('data-genero').toLowerCase();
+
+                if (titulo.includes(query) || autor.includes(query) || genero.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleFavorito(event, titulo) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+            const index = favoritos.indexOf(titulo);
+            if (index > -1) {
+                favoritos.splice(index, 1);
+            } else {
+                favoritos.push(titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            atualizarIconesFavoritos();
+        }
+
+        function atualizarIconesFavoritos() {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const botoes = document.querySelectorAll('.favorito-btn');
+
+            botoes.forEach(btn => {
+                const titulo = btn.getAttribute('data-titulo-btn');
+                if (favoritos.includes(titulo)) {
+                    btn.classList.add('ativo');
+                } else {
+                    btn.classList.remove('ativo');
+                }
+            });
+        }
+
+        // Atualizar ícones ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarIconesFavoritos();
+        });
     </script>
 }
