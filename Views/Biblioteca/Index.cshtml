@@ -25,6 +25,10 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título, autor ou gênero..." aria-label="Pesquisar livros">
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -33,11 +37,14 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@(item.Titulo?.ToLower() ?? "")" data-autor="@(item.Autor?.ToLower() ?? "")" data-genero="@(item.Genero?.ToLower() ?? "")">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <button class="fav-btn" onclick="toggleFavoritoCatalogo(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', this)" aria-label="Favoritar">
+                                ☆
+                            </button>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -116,6 +123,57 @@
             }
         }
 
+        // --- Lógica de Favoritos --- //
+        function getFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function setFavoritos(favs) {
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        }
+
+        function toggleFavoritoCatalogo(event, titulo, btnElement) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favs = getFavoritos();
+            const index = favs.indexOf(titulo);
+
+            if (index > -1) {
+                favs.splice(index, 1);
+                btnElement.innerText = '☆';
+                btnElement.classList.remove('favoritado');
+            } else {
+                favs.push(titulo);
+                btnElement.innerText = '⭐';
+                btnElement.classList.add('favoritado');
+            }
+            setFavoritos(favs);
+        }
+
+        // Atualizar os ícones de favoritos ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const favs = getFavoritos();
+            const btns = document.querySelectorAll('.fav-btn');
+
+            btns.forEach(btn => {
+                // Navegar do botão para pegar o data-titulo no card
+                const card = btn.closest('.livro-card');
+                if (card) {
+                    const titulo = card.getAttribute('data-titulo'); // Atenção: aqui o titulo esta em lowercase por causa do data-attr
+                    // Vamos ter que extrair o título real do dom pra manter cases, ou verificar case-insensitive
+                    // Para ficar preciso, vamos buscar o título original que está no h4
+                    const tituloReal = card.querySelector('h4').innerText;
+
+                    if (favs.includes(tituloReal)) {
+                        btn.innerText = '⭐';
+                        btn.classList.add('favoritado');
+                    }
+                }
+            });
+        });
+
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
         function abrirLivro(titulo, autor, corCapa, genero, ano, paginas) {
             // Salvar no localStorage os dados que o Livro.cshtml precisa montar
@@ -137,5 +195,23 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // Sistema de Busca
+        document.getElementById('searchInput')?.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo') || "";
+                const autor = card.getAttribute('data-autor') || "";
+                const genero = card.getAttribute('data-genero') || "";
+
+                if (titulo.includes(query) || autor.includes(query) || genero.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
     </script>
 }
