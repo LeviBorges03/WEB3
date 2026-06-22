@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button id="btnFavorito" class="expand-btn" onclick="toggleFavoritoPagina()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -56,6 +56,51 @@
         </div>
     </main>
 </div>
+
+<script>
+    const livroFixoProtótipo = "O Mistério do Código Eterno";
+
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarBotaoFavorito();
+    });
+
+    function getFavoritos() {
+        const favs = localStorage.getItem('bibliotecaFavoritos');
+        return favs ? JSON.parse(favs) : [];
+    }
+
+    function setFavoritos(favs) {
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+    }
+
+    function atualizarBotaoFavorito() {
+        const favs = getFavoritos();
+        const btn = document.getElementById('btnFavorito');
+        if (favs.includes(livroFixoProtótipo)) {
+            btn.innerText = "Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--accent)";
+            btn.style.color = "white";
+        } else {
+            btn.innerText = "Adicionar aos Favoritos";
+            btn.style.backgroundColor = "var(--white)";
+            btn.style.color = "var(--primary)";
+        }
+    }
+
+    function toggleFavoritoPagina() {
+        let favs = getFavoritos();
+        const index = favs.indexOf(livroFixoProtótipo);
+
+        if (index > -1) {
+            favs.splice(index, 1);
+        } else {
+            favs.push(livroFixoProtótipo);
+        }
+
+        setFavoritos(favs);
+        atualizarBotaoFavorito();
+    }
+</script>
 
 </body>
 </html>
