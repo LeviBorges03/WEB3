@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritoLivro" onclick="toggleFavoritoLivroAtual()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,34 @@
     </main>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const titulo = document.querySelector('.livro-header-info h1').innerText;
+        const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+        const btnFav = document.getElementById('btnFavoritoLivro');
+
+        if (favoritos.includes(titulo)) {
+            btnFav.innerText = "Remover dos Favoritos";
+        } else {
+            btnFav.innerText = "Adicionar aos Favoritos";
+        }
+    });
+
+    function toggleFavoritoLivroAtual() {
+        const titulo = document.querySelector('.livro-header-info h1').innerText;
+        let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+        const btnFav = document.getElementById('btnFavoritoLivro');
+
+        if (favoritos.includes(titulo)) {
+            favoritos = favoritos.filter(f => f !== titulo);
+            btnFav.innerText = "Adicionar aos Favoritos";
+        } else {
+            favoritos.push(titulo);
+            btnFav.innerText = "Remover dos Favoritos";
+        }
+
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+    }
+</script>
 </body>
 </html>

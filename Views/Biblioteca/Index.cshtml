@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="search-container" style="margin-top: 15px;">
+            <input type="text" id="searchBar" oninput="filtrarLivros(event)" placeholder="Pesquisar livros por título..." style="padding: 10px; width: 80%; max-width: 400px; border-radius: 20px; border: 1px solid var(--accent); outline: none;" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -33,11 +36,12 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-btn" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; cursor: pointer; color: #fff; text-shadow: 0 0 3px #000;" title="Adicionar aos Favoritos">☆</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -136,6 +140,57 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // --- FAVORITES & SEARCH --- //
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const buttons = document.querySelectorAll('.favorito-btn');
+
+            buttons.forEach(btn => {
+                const titulo = btn.closest('.livro-card').getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    btn.innerText = '⭐';
+                    btn.title = 'Remover dos Favoritos';
+                } else {
+                    btn.innerText = '☆';
+                    btn.title = 'Adicionar aos Favoritos';
+                }
+            });
+        });
+
+        function toggleFavorito(event, titulo) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const btn = event.target;
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(f => f !== titulo);
+                btn.innerText = '☆';
+                btn.title = 'Adicionar aos Favoritos';
+            } else {
+                favoritos.push(titulo);
+                btn.innerText = '⭐';
+                btn.title = 'Remover dos Favoritos';
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
+
+        function filtrarLivros(event) {
+            const termo = event.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo').toLowerCase();
+                if (titulo.includes(termo)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
