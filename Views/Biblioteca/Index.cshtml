@@ -16,6 +16,28 @@
             color: var(--primary);
             text-decoration: underline;
         }
+
+        .favoritar-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .favoritar-btn:hover {
+            transform: scale(1.2);
+        }
+
     </style>
 }
 
@@ -25,6 +47,11 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container" style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 60%; max-width: 400px; border: 2px solid var(--accent); border-radius: 20px; outline: none; font-size: 1rem;">
+    </div>
+
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -33,11 +60,15 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo" data-autor="@item.Autor">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
-                            <span class="genero-tag">@item.Genero</span>
+
+                        <button class="favoritar-btn" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', this)" title="Favoritar">
+                            ☆
+                        </button>
+                        <span class="genero-tag">@item.Genero</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -85,6 +116,24 @@
 
 @section Scripts {
     <script>
+
+        // Função para filtrar os livros na barra de pesquisa
+        function filtrarLivros() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo').toLowerCase();
+                const autor = card.getAttribute('data-autor').toLowerCase();
+
+                if (titulo.includes(query) || autor.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         // Função simples para rolar os livros lateralmente
         function scrollGrid(direction) {
             const grid = document.getElementById('livrosGrid');
@@ -114,6 +163,42 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+
+        // Inicializa estrelas ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            document.querySelectorAll('.favoritar-btn').forEach(btn => {
+                // extrai o titulo da chamada onclick usando regex simples (ou apenas match).
+                // Uma maneira melhor e usar um atributo data, mas vamos usar o title atual ou extrair.
+                // Mas como podemos nao ter o titulo facil no JS a partir do botao sem adicionar data-,
+                // Vamos usar data-titulo no botao na proxima iteracao, ou aqui mesmo:
+            });
+            // Melhor: Iterar sobre os cards
+            const cards = document.querySelectorAll('.livro-card');
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    const btn = card.querySelector('.favoritar-btn');
+                    if (btn) btn.innerText = '⭐';
+                }
+            });
+        });
+
+        function toggleFavorito(event, titulo, btnElement) {
+            event.stopPropagation();
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(t => t !== titulo);
+                btnElement.innerText = '☆';
+            } else {
+                favoritos.push(titulo);
+                btnElement.innerText = '⭐';
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
