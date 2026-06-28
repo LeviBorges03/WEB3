@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div style="margin-top: 15px;">
+            <input type="text" id="pesquisaLivros" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..." style="padding: 10px; width: 80%; max-width: 400px; border: 1px solid var(--accent); border-radius: 20px; outline: none; font-size: 1rem;" />
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -33,12 +36,19 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo" data-autor="@item.Autor">
                     <!-- Link clicável e script JS embutido no onclick -->
-                    <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
+                    <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column; position: relative;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
                         </div>
+
+                        <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                            <button onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" style="background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                <span class="estrela-favorito" data-titulo-estrela="@item.Titulo">☆</span>
+                            </button>
+                        </div>
+
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
 
@@ -137,5 +147,61 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // --- FILTRO DE PESQUISA --- //
+        function filtrarLivros() {
+            const query = document.getElementById('pesquisaLivros').value.toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo').toLowerCase();
+                const autor = card.getAttribute('data-autor').toLowerCase();
+
+                if (titulo.includes(query) || autor.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // --- FAVORITOS --- //
+        function getFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function toggleFavorito(event, titulo) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favs = getFavoritos();
+
+            if (favs.includes(titulo)) {
+                favs = favs.filter(f => f !== titulo);
+            } else {
+                favs.push(titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+            atualizarEstrelas();
+        }
+
+        function atualizarEstrelas() {
+            const favs = getFavoritos();
+            const estrelas = document.querySelectorAll('.estrela-favorito');
+
+            estrelas.forEach(estrela => {
+                const titulo = estrela.getAttribute('data-titulo-estrela');
+                if (favs.includes(titulo)) {
+                    estrela.innerText = '⭐';
+                } else {
+                    estrela.innerText = '☆';
+                }
+            });
+        }
+
+        // Atualiza as estrelas quando a página carrega
+        document.addEventListener('DOMContentLoaded', atualizarEstrelas);
     </script>
 }
