@@ -30,7 +30,7 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritoLivro" onclick="toggleFavoritoLivroAtual()">Adicionar aos Favoritos</button>
             </div>
         </section>
 
@@ -57,5 +57,48 @@
     </main>
 </div>
 
+<script>
+    // --- FAVORITOS (Livro Atual Estático) --- //
+    function getFavoritos() {
+        const favs = localStorage.getItem('bibliotecaFavoritos');
+        return favs ? JSON.parse(favs) : [];
+    }
+
+    function toggleFavoritoLivroAtual() {
+        const tituloAtual = document.querySelector('.livro-header-info h1').innerText;
+        if (!tituloAtual) return;
+
+        let favs = getFavoritos();
+        if (favs.includes(tituloAtual)) {
+            favs = favs.filter(f => f !== tituloAtual);
+        } else {
+            favs.push(tituloAtual);
+        }
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+        atualizarBotaoFavorito(tituloAtual);
+    }
+
+    function atualizarBotaoFavorito(titulo) {
+        if(!titulo) return;
+        const favs = getFavoritos();
+        const btn = document.getElementById('btnFavoritoLivro');
+        if (favs.includes(titulo)) {
+            btn.innerText = "⭐ Remover dos Favoritos";
+            btn.style.backgroundColor = "var(--accent, #3498db)";
+            btn.style.color = "white";
+        } else {
+            btn.innerText = "☆ Adicionar aos Favoritos";
+            btn.style.backgroundColor = "var(--white, #ffffff)";
+            btn.style.color = "var(--primary, #2c3e50)";
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+         const tituloAtual = document.querySelector('.livro-header-info h1').innerText;
+         if(tituloAtual) {
+            atualizarBotaoFavorito(tituloAtual);
+         }
+    });
+</script>
 </body>
 </html>

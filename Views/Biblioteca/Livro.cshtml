@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavoritoLivro" onclick="toggleFavoritoLivroAtual()">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -230,5 +230,51 @@
                 window.location.href = '@Url.Action("Autor", "Biblioteca")';
             }
         }
+
+        // --- FAVORITOS (Livro Atual) --- //
+        function getFavoritos() {
+            const favs = localStorage.getItem('bibliotecaFavoritos');
+            return favs ? JSON.parse(favs) : [];
+        }
+
+        function toggleFavoritoLivroAtual() {
+            const tituloAtual = document.getElementById('livroTitulo').innerText;
+            if (tituloAtual === "Nenhum Livro Selecionado" || tituloAtual === "Título Carregando...") return;
+
+            let favs = getFavoritos();
+            if (favs.includes(tituloAtual)) {
+                favs = favs.filter(f => f !== tituloAtual);
+            } else {
+                favs.push(tituloAtual);
+            }
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+            atualizarBotaoFavorito(tituloAtual);
+        }
+
+        function atualizarBotaoFavorito(titulo) {
+            if(!titulo) return;
+            const favs = getFavoritos();
+            const btn = document.getElementById('btnFavoritoLivro');
+            if (favs.includes(titulo)) {
+                btn.innerText = "⭐ Remover dos Favoritos";
+                btn.style.backgroundColor = "var(--accent)";
+                btn.style.color = "white";
+            } else {
+                btn.innerText = "☆ Adicionar aos Favoritos";
+                btn.style.backgroundColor = "var(--white)";
+                btn.style.color = "var(--primary)";
+            }
+        }
+
+        // Estender o DOMContentLoaded para atualizar o botão com o título lido
+        const oldDomContentLoaded = window.onload; // Para evitar sobrescrever caso haja
+        document.addEventListener('DOMContentLoaded', () => {
+             const data = localStorage.getItem('livroAtual');
+             if (data) {
+                 const livro = JSON.parse(data);
+                 atualizarBotaoFavorito(livro.titulo);
+             }
+        });
+
     </script>
 }
