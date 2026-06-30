@@ -25,6 +25,10 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por título ou autor..." oninput="filtrarLivros()" />
+    </div>
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -33,11 +37,14 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@Html.Raw(System.Web.HttpUtility.HtmlEncode(item.Titulo))" data-autor="@Html.Raw(System.Web.HttpUtility.HtmlEncode(item.Autor))">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <button class="btn-favorito" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', this)" aria-label="Favoritar livro" title="Adicionar aos favoritos">
+                                ☆
+                            </button>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -136,6 +143,71 @@
 
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
+        }
+
+        // --- FUNÇÕES DE FAVORITO --- //
+        function carregarFavoritos() {
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const botoes = document.querySelectorAll('.btn-favorito');
+            botoes.forEach(btn => {
+                // Obter o título do card que contém o botão
+                const card = btn.closest('.livro-card');
+                const titulo = card.getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    btn.classList.add('ativo');
+                    btn.innerText = '⭐';
+                    btn.title = 'Remover dos favoritos';
+                } else {
+                    btn.classList.remove('ativo');
+                    btn.innerText = '☆';
+                    btn.title = 'Adicionar aos favoritos';
+                }
+            });
+        }
+
+        function toggleFavorito(event, titulo, btn) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(f => f !== titulo);
+                btn.classList.remove('ativo');
+                btn.innerText = '☆';
+                btn.title = 'Adicionar aos favoritos';
+            } else {
+                favoritos.push(titulo);
+                btn.classList.add('ativo');
+                btn.innerText = '⭐';
+                btn.title = 'Remover dos favoritos';
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarFavoritos);
+
+        // Função de pesquisa
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const termo = input.value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo') || "";
+                const autor = card.getAttribute('data-autor') || "";
+
+                const tituloNorm = titulo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                const autorNorm = autor.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+                if (tituloNorm.includes(termo) || autorNorm.includes(termo)) {
+                    // Use flex explicitly as requested by memory
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 }
