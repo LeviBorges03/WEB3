@@ -21,9 +21,15 @@
 
 <div class="page-wrapper">
 
+
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
     </section>
+
+    <div class="search-container" style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="pesquisaLivros" placeholder="Pesquisar por título, autor ou gênero..." style="width: 80%; max-width: 600px; padding: 10px 15px; border-radius: 25px; border: 1px solid var(--accent); font-size: 1rem; outline: none;" oninput="filtrarLivros()">
+    </div>
+
 
     <div class="carousel-container">
         @* Botão Esquerdo *@
@@ -33,11 +39,12 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo" data-autor="@item.Autor" data-genero="@item.Genero">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <span class="favorito-icon" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', this)" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; color: #ccc; cursor: pointer; z-index: 3;">☆</span>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -137,5 +144,66 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+
+        // Favoritos Logic
+        function toggleFavorito(event, titulo, element) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const index = favoritos.indexOf(titulo);
+
+            if (index > -1) {
+                favoritos.splice(index, 1);
+                element.innerText = '☆';
+                element.style.color = '#ccc';
+            } else {
+                favoritos.push(titulo);
+                element.innerText = '⭐';
+                element.style.color = '#f1c40f'; // Gold star
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
+
+        // Initialize favorites on load
+        document.addEventListener('DOMContentLoaded', () => {
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const cartoes = document.getElementsByClassName('livro-card');
+
+            for (let i = 0; i < cartoes.length; i++) {
+                const cartao = cartoes[i];
+                const titulo = cartao.getAttribute('data-titulo');
+                const icone = cartao.querySelector('.favorito-icon');
+
+                if (icone && titulo && favoritos.includes(titulo)) {
+                    icone.innerText = '⭐';
+                    icone.style.color = '#f1c40f';
+                }
+            }
+        });
+
+        function filtrarLivros() {
+
+            const input = document.getElementById('pesquisaLivros').value;
+            const filtro = input.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+            const grid = document.getElementById('livrosGrid');
+            const cartoes = grid.getElementsByClassName('livro-card');
+
+            for (let i = 0; i < cartoes.length; i++) {
+                const cartao = cartoes[i];
+                const titulo = (cartao.getAttribute('data-titulo') || "").normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+                const autor = (cartao.getAttribute('data-autor') || "").normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+                const genero = (cartao.getAttribute('data-genero') || "").normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+                if (titulo.includes(filtro) || autor.includes(filtro) || genero.includes(filtro)) {
+                    cartao.style.display = 'flex';
+                } else {
+                    cartao.style.display = 'none';
+                }
+            }
+        }
     </script>
+
 }
