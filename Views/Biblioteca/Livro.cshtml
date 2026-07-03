@@ -164,7 +164,7 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavorito">Adicionar aos Favoritos</button>
                 </div>
             </div>
         </section>
@@ -214,10 +214,36 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                // Lógica de Favoritos na página do Livro
+                const btnFavorito = document.getElementById('btnFavorito');
+                let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+
+                if (favoritos.includes(livro.titulo)) {
+                    btnFavorito.innerText = "Remover dos Favoritos";
+                } else {
+                    btnFavorito.innerText = "Adicionar aos Favoritos";
+                }
+
+                btnFavorito.addEventListener('click', () => {
+                    favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+                    const index = favoritos.indexOf(livro.titulo);
+
+                    if (index > -1) {
+                        favoritos.splice(index, 1);
+                        btnFavorito.innerText = "Adicionar aos Favoritos";
+                    } else {
+                        favoritos.push(livro.titulo);
+                        btnFavorito.innerText = "Remover dos Favoritos";
+                    }
+
+                    localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+                });
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
                 document.getElementById('livroAutor').innerText = "Volte ao Catálogo";
+                document.getElementById('btnFavorito').style.display = 'none';
             }
         });
 
