@@ -23,6 +23,7 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Buscar obras ou autores..." style="width: 100%; max-width: 600px; padding: 10px; margin-top: 15px; border-radius: 5px; border: 1px solid #ccc;" />
     </section>
 
     <div class="carousel-container">
@@ -33,14 +34,17 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))" data-autor="@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
                         </div>
                         <div class="livro-info">
-                            <h4>@item.Titulo</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h4>@item.Titulo</h4>
+                                <span class="favorito-star" onclick="toggleFavoritoCatalogo(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', this)" style="cursor: pointer; font-size: 1.2rem; margin-left: 10px;" title="Adicionar aos Favoritos">☆</span>
+                            </div>
 
                             @* Elemento independente para abrir o Autor sem acionar o clique do livro usando event.stopPropagation() *@
                             <div onclick="abrirAutor(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))')">
@@ -114,6 +118,66 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        // Atualiza as estrelas de favoritos no catálogo ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const stars = document.querySelectorAll('.favorito-star');
+
+            stars.forEach(star => {
+                // Navega para cima até o card para pegar o título de forma segura do atributo data
+                const card = star.closest('.livro-card');
+                if(card) {
+                    const titulo = card.getAttribute('data-titulo');
+                    if(favoritos.includes(titulo)) {
+                        star.innerText = '⭐';
+                        star.title = "Remover dos Favoritos";
+                    } else {
+                        star.innerText = '☆';
+                        star.title = "Adicionar aos Favoritos";
+                    }
+                }
+            });
+        });
+
+        // Alterna o estado de favorito direto do catálogo
+        function toggleFavoritoCatalogo(event, titulo, element) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+            const index = favoritos.indexOf(titulo);
+
+            if (index > -1) {
+                favoritos.splice(index, 1);
+                element.innerText = '☆';
+                element.title = "Adicionar aos Favoritos";
+            } else {
+                favoritos.push(titulo);
+                element.innerText = '⭐';
+                element.title = "Remover dos Favoritos";
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
+
+        // Função de pesquisa com normalização
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = (card.getAttribute('data-titulo') || "").normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                const autor = (card.getAttribute('data-autor') || "").normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+                if (titulo.includes(filter) || autor.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
