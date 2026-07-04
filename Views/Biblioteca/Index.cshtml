@@ -25,7 +25,16 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+
+    <div class="search-container" style="margin-bottom: 20px; text-align: center;">
+        <input type="text" id="searchInput" oninput="filtrarLivros()" placeholder="Pesquisar por título ou autor..."
+               style="width: 80%; max-width: 500px; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--accent); box-shadow: var(--shadow); outline: none; transition: box-shadow 0.3s;"
+               onfocus="this.style.boxShadow='0 0 10px rgba(52, 152, 219, 0.5)'"
+               onblur="this.style.boxShadow='var(--shadow)'" />
+    </div>
+
     <div class="carousel-container">
+
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
 
@@ -33,11 +42,12 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo" data-autor="@item.Autor">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <button type="button" class="btn-favorito" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; z-index: 10; color: #ccc; transition: color 0.3s;" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', this)" title="Favoritar" aria-label="Favoritar">★</button>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -114,6 +124,65 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+
+        // Função de pesquisa
+        function filtrarLivros() {
+            const input = document.getElementById('searchInput');
+            if (!input) return;
+
+            const filter = input.value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo') || '';
+                const autor = card.getAttribute('data-autor') || '';
+
+                const tituloNormalizado = titulo.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+                const autorNormalizado = autor.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+                if (tituloNormalizado.includes(filter) || autorNormalizado.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+
+        // Atualizar visual das estrelas ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo');
+                if (favoritos.includes(titulo)) {
+                    const btn = card.querySelector('.btn-favorito');
+                    if (btn) {
+                        btn.style.color = '#f1c40f'; // Dourado
+                    }
+                }
+            });
+        });
+
+        // Toggle favorito
+        function toggleFavorito(event, titulo, btn) {
+            event.stopPropagation(); // Evitar navegação
+            event.preventDefault(); // Evitar ação da âncora pai se for o caso
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(f => f !== titulo);
+                btn.style.color = '#ccc'; // Cinza (não favoritado)
+            } else {
+                favoritos.push(titulo);
+                btn.style.color = '#f1c40f'; // Dourado (favoritado)
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //

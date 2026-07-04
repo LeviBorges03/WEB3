@@ -162,9 +162,12 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
+                <!-- Botão expand-btn padrão -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavoritoLivro" onclick="toggleFavoritoLivroDetalhe()" style="display: flex; align-items: center; gap: 8px;">
+                        <span id="iconeFavorito" style="font-size: 1.2rem; color: #ccc;">★</span>
+                        <span id="textoFavorito">Adicionar aos Favoritos</span>
+                    </button>
                 </div>
             </div>
         </section>
@@ -196,6 +199,39 @@
 
 @section Scripts {
     <script>
+
+        // Atualiza o estado do botão na inicialização
+        function checkFavoritoLivroDetalhe() {
+            const data = localStorage.getItem('livroAtual');
+            if (data) {
+                const livro = JSON.parse(data);
+                const favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+                const isFav = favoritos.includes(livro.titulo);
+
+                document.getElementById('iconeFavorito').style.color = isFav ? '#f1c40f' : '#ccc';
+                document.getElementById('textoFavorito').innerText = isFav ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos';
+            }
+        }
+
+        // Toggle favorito no detalhe do livro
+        function toggleFavoritoLivroDetalhe() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+            const livro = JSON.parse(data);
+
+            let favoritos = JSON.parse(localStorage.getItem('bibliotecaFavoritos')) || [];
+            const isFav = favoritos.includes(livro.titulo);
+
+            if (isFav) {
+                favoritos = favoritos.filter(f => f !== livro.titulo);
+            } else {
+                favoritos.push(livro.titulo);
+            }
+
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+            checkFavoritoLivroDetalhe();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Tenta pegar o livro do LocalStorage
             const data = localStorage.getItem('livroAtual');
@@ -214,6 +250,9 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                // Checa favoritos
+                checkFavoritoLivroDetalhe();
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
