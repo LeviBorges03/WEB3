@@ -30,7 +30,10 @@
                     <span class="meta-item"><strong>Idioma:</strong> Português</span>
                 </div>
 
-                <button class="expand-btn">Adicionar aos Favoritos</button>
+                <button class="expand-btn" id="btnFavoritarLivro" onclick="toggleFavoritoLivroAtual('O Mistério do Código Eterno')">
+                    <span id="iconeFavoritoBtn" style="color: #ccc; margin-right: 5px; font-size: 1.2rem;">&#9733;</span>
+                    <span id="textoFavoritoBtn">Adicionar aos Favoritos</span>
+                </button>
             </div>
         </section>
 
@@ -56,6 +59,51 @@
         </div>
     </main>
 </div>
+
+<script>
+    function getFavoritos() {
+        const favs = localStorage.getItem('bibliotecaFavoritos');
+        return favs ? JSON.parse(favs) : [];
+    }
+
+    function saveFavoritos(favs) {
+        localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favs));
+    }
+
+    function isFavorito(titulo) {
+        const favs = getFavoritos();
+        return favs.includes(titulo);
+    }
+
+    function toggleFavoritoLivroAtual(titulo) {
+        let favs = getFavoritos();
+        if (favs.includes(titulo)) {
+            favs = favs.filter(t => t !== titulo);
+        } else {
+            favs.push(titulo);
+        }
+        saveFavoritos(favs);
+        atualizarBotaoFavorito(titulo);
+    }
+
+    function atualizarBotaoFavorito(titulo) {
+        const btnIcone = document.getElementById('iconeFavoritoBtn');
+        const btnTexto = document.getElementById('textoFavoritoBtn');
+        if (btnIcone && btnTexto) {
+            if (isFavorito(titulo)) {
+                btnIcone.style.color = '#f1c40f';
+                btnTexto.innerText = "Remover dos Favoritos";
+            } else {
+                btnIcone.style.color = '#ccc';
+                btnTexto.innerText = "Adicionar aos Favoritos";
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarBotaoFavorito('O Mistério do Código Eterno');
+    });
+</script>
 
 </body>
 </html>

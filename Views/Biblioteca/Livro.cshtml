@@ -164,7 +164,10 @@
 
                 <!-- Botão expand-btn padrão (fundo branco, borda azul, hover azul sólido transladado -2px) -->
                 <div>
-                    <button class="expand-btn">Adicionar aos Favoritos</button>
+                    <button class="expand-btn" id="btnFavoritarLivro" onclick="toggleFavoritoLivroAtual()">
+                        <span id="iconeFavoritoBtn" style="color: #ccc; margin-right: 5px; font-size: 1.2rem;">&#9733;</span>
+                        <span id="textoFavoritoBtn">Adicionar aos Favoritos</span>
+                    </button>
                 </div>
             </div>
         </section>
@@ -196,8 +199,39 @@
 
 @section Scripts {
     <script>
+
+        function toggleFavoritoLivroAtual() {
+            const data = localStorage.getItem('livroAtual');
+            if (!data) return;
+            const livro = JSON.parse(data);
+
+            // Reutilizando lógica do site.js
+            let favs = getFavoritos();
+            if (favs.includes(livro.titulo)) {
+                favs = favs.filter(t => t !== livro.titulo);
+            } else {
+                favs.push(livro.titulo);
+            }
+            saveFavoritos(favs);
+            atualizarBotaoFavorito(livro.titulo);
+        }
+
+        function atualizarBotaoFavorito(titulo) {
+            const btnIcone = document.getElementById('iconeFavoritoBtn');
+            const btnTexto = document.getElementById('textoFavoritoBtn');
+            if (btnIcone && btnTexto) {
+                if (isFavorito(titulo)) {
+                    btnIcone.style.color = '#f1c40f';
+                    btnTexto.innerText = "Remover dos Favoritos";
+                } else {
+                    btnIcone.style.color = '#ccc';
+                    btnTexto.innerText = "Adicionar aos Favoritos";
+                }
+            }
+        }
+
+        // Modificando DOMContentLoaded para atualizar o botão ao carregar
         document.addEventListener('DOMContentLoaded', () => {
-            // Tenta pegar o livro do LocalStorage
             const data = localStorage.getItem('livroAtual');
 
             if (data) {
@@ -214,6 +248,8 @@
 
                 // Simular uma sinopse basica baseada no nome
                 document.getElementById('livroSinopse').innerText = "Uma extraordinária obra literária do mestre " + livro.autor + ". O livro '" + livro.titulo + "' revolucionou o gênero " + livro.genero + " com sua narrativa única.";
+
+                atualizarBotaoFavorito(livro.titulo);
             } else {
                 // Fallback caso acesse a página diretamente pela URL sem clicar em um livro
                 document.getElementById('livroTitulo').innerText = "Nenhum Livro Selecionado";
