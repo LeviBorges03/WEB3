@@ -23,6 +23,9 @@
 
     <section class="biblioteca-header">
         <h2>Catálogo de Clássicos</h2>
+        <div class="pesquisa-container" style="margin-top: 15px; text-align: center;">
+            <input type="text" id="pesquisaInput" class="pesquisa-input" placeholder="Pesquisar por título ou autor..." oninput="filtrarLivros()" style="width: 100%; max-width: 500px; padding: 10px 15px; border-radius: 25px; border: 1px solid var(--accent); outline: none; font-size: 1rem; box-shadow: var(--shadow);">
+        </div>
     </section>
 
     <div class="carousel-container">
@@ -33,7 +36,7 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo" data-autor="@item.Autor">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
@@ -45,6 +48,11 @@
                             @* Elemento independente para abrir o Autor sem acionar o clique do livro usando event.stopPropagation() *@
                             <div onclick="abrirAutor(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))')">
                                 <p class="autor-link-hover">@item.Autor</p>
+                            </div>
+
+                            <!-- Ícone de favorito -->
+                            <div class="favorito-icon-container" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" style="margin-top: auto; align-self: flex-end; padding-top: 10px;">
+                                <span class="favorito-icon" data-fav-titulo="@item.Titulo" style="font-size: 1.5rem; color: #ccc; cursor: pointer; transition: color 0.3s;">&#9733;</span>
                             </div>
                         </div>
                     </a>
@@ -114,6 +122,22 @@
                 btn.setAttribute('aria-label', 'Expandir catálogo');
                 btnText.innerText = "Ver todo o catálogo";
             }
+        }
+
+        function filtrarLivros() {
+            const query = document.getElementById('pesquisaInput').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const cards = document.querySelectorAll('.livro-card');
+
+            cards.forEach(card => {
+                const titulo = card.getAttribute('data-titulo').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const autor = card.getAttribute('data-autor').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+                if (titulo.includes(query) || autor.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // --- NOVAS FUNÇÕES: SPA-Like JS Data Transfer --- //
