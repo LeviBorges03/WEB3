@@ -25,6 +25,8 @@
         <h2>Catálogo de Clássicos</h2>
     </section>
 
+    <input type="text" id="pesquisaLivro" placeholder="Pesquisar livros..." oninput="filtrarLivros()" style="margin-bottom: 20px; width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+
     <div class="carousel-container">
         @* Botão Esquerdo *@
         <button class="nav-btn left" onclick="scrollGrid(-1)">&#10094;</button>
@@ -33,11 +35,12 @@
         <div class="livros-grid" id="livrosGrid">
             @foreach (var item in Model)
             {
-                <div class="livro-card">
+                <div class="livro-card" data-titulo="@item.Titulo">
                     <!-- Link clicável e script JS embutido no onclick -->
                     <a href="javascript:void(0);" onclick="abrirLivro('@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))', '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Autor))', '@item.CorCapa', '@item.Genero', '@item.DataPublicacao.Year', '@item.NumPaginas')" class="livro-card-link" style="text-decoration: none; color: inherit; flex-grow: 1; display: flex; flex-direction: column;">
                         <div class="livro-capa-placeholder" style="background-color: @item.CorCapa;">
                             <span class="genero-tag">@item.Genero</span>
+                            <div class="favorito-star" onclick="toggleFavorito(event, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Titulo))')" style="position: absolute; top: 10px; right: 10px; font-size: 1.5rem; cursor: pointer; color: #ccc; z-index: 3;" data-titulo-star="@item.Titulo">⭐</div>
                         </div>
                         <div class="livro-info">
                             <h4>@item.Titulo</h4>
@@ -137,5 +140,62 @@
             // Redirecionar para a View Genérica
             window.location.href = '@Url.Action("Autor", "Biblioteca")';
         }
+
+        // Favoritos
+        function getFavoritos() {
+            return JSON.parse(localStorage.getItem('bibliotecaFavoritos') || '[]');
+        }
+
+        function setFavoritos(favoritos) {
+            localStorage.setItem('bibliotecaFavoritos', JSON.stringify(favoritos));
+        }
+
+        function toggleFavorito(event, titulo) {
+            event.stopPropagation();
+            event.preventDefault();
+            let favoritos = getFavoritos();
+            if (favoritos.includes(titulo)) {
+                favoritos = favoritos.filter(f => f !== titulo);
+            } else {
+                favoritos.push(titulo);
+            }
+            setFavoritos(favoritos);
+            atualizarEstrelas();
+        }
+
+        function atualizarEstrelas() {
+            const favoritos = getFavoritos();
+            document.querySelectorAll('.favorito-star').forEach(star => {
+                const titulo = star.getAttribute('data-titulo-star');
+                if (favoritos.includes(titulo)) {
+                    star.style.color = '#f1c40f'; // active
+                } else {
+                    star.style.color = '#ccc'; // inactive
+                }
+            });
+        }
+
+        // Pesquisa
+        function filtrarLivros() {
+            const searchInput = document.getElementById('pesquisaLivro').value;
+            // Normaliza para remover acentos
+            const term = searchInput.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+            document.querySelectorAll('.livro-card').forEach(card => {
+                const titulo = card.getAttribute('data-titulo');
+                if (!titulo) return;
+
+                const tituloNormalized = titulo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                if (tituloNormalized.includes(term)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarEstrelas();
+        });
     </script>
 }
